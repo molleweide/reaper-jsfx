@@ -6,7 +6,8 @@ version: 1.0
 
    TODO
 
-   fix transpose buttons
+   create function that checks for equality of a set of different keys
+   eg. noteIs(resetKey)?? where reset could be more than one value. so that I can move keys around the keyboard.
 
  */
 
@@ -52,12 +53,12 @@ function transpose_up()(
     SINGLE_ROOT_NOTE < 127 ? (
       SINGLE_ROOT_NOTE += 1;
       )
-);
+    );
 function transpose_down()(
     SINGLE_ROOT_NOTE > 0 ? (
       SINGLE_ROOT_NOTE -= 1;
       )
-);
+    );
 function transpose(input)(
     input == KC_TRANSPOSE_RESET_1 ? SINGLE_ROOT_NOTE = 24;
     input == KC_TRANSPOSE_RESET_2 ? SINGLE_ROOT_NOTE = 36;
@@ -67,12 +68,12 @@ function transpose(input)(
 
     input == KC_TRANSPOSE_UP ? transpose_up();
     input == KC_TRANSPOSE_DOWN ? transpose_down();
-);
+    );
 
 function customFilterCheck(note) (
-    (note < QMK_MAIN_LOW || note > QMK_MAIN_HIGH)
-    && note != QMK_THUMB_L && note != QMK_THUMB_R;
-);
+      (note < QMK_MAIN_LOW || note > QMK_MAIN_HIGH)
+      && note != QMK_THUMB_L && note != QMK_THUMB_R;
+      );
 
 @slider
   SINGLE_ROOT_NOTE = slider1;
@@ -95,15 +96,10 @@ function customFilterCheck(note) (
             // WITHIN FILTER WINDOW -------------------
             note = SINGLE_ROOT_NOTE;
             midisend(offset,msg1,note+vel*256);
-
             ):(
               // OUTSIDE FILTER WINDOW ------------------
               WAS_FILTERED[note] = 1;
-
               transpose(note);
-              /* note == KC_TRANSPOSE_UP ? transpose_up(); */
-              /* note == KC_TRANSPOSE_DOWN ? transpose_down(); */
-              /* note == KC_TRANSP_RESET ? transpose_reset(); */
               );
           ):
 
