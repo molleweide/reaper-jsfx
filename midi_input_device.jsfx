@@ -1,0 +1,127 @@
+desc: molleweide custom midi device preprocessor
+author: molleweide
+version: 1.0
+
+/*
+
+   TODO
+
+   fix transpose buttons
+
+ */
+
+slider1:48<1,127, 1>: note select
+
+out_pin:none
+out_pin:none
+
+@init
+
+NOTE_OFF = 8;
+NOTE_ON = 9;
+
+WAS_FILTERED = 1024;  // array for storing which notes are filtered
+
+PASS_THRU_CC = 0;
+
+SINGLE_ROOT_NOTE = 24;
+
+QMK = 0;
+PIANO_GRAND = 1;
+INSTRUMENT = QMK;
+
+// modes
+MODE = 0;
+
+QMK_MAIN_HIGH = 85;
+QMK_MAIN_LOW = 56;
+QMK_THUMB_L = 51;
+QMK_THUMB_R = 52;
+
+
+//TRANSPOSE_RESET = ;
+KC_TRANSPOSE_DOWN = 50;
+KC_TRANSPOSE_UP = 53;
+KC_TRANSPOSE_RESET_1 = 86;
+KC_TRANSPOSE_RESET_2 = 87;
+KC_TRANSPOSE_RESET_3 = 88;
+KC_TRANSPOSE_RESET_4 = 89;
+KC_TRANSPOSE_RESET_5 = 90;
+
+function transpose_up()(
+    SINGLE_ROOT_NOTE < 127 ? (
+      SINGLE_ROOT_NOTE += 1;
+      )
+);
+function transpose_down()(
+    SINGLE_ROOT_NOTE > 0 ? (
+      SINGLE_ROOT_NOTE -= 1;
+      )
+);
+function transpose(input)(
+    input == KC_TRANSPOSE_RESET_1 ? SINGLE_ROOT_NOTE = 24;
+    input == KC_TRANSPOSE_RESET_2 ? SINGLE_ROOT_NOTE = 36;
+    input == KC_TRANSPOSE_RESET_3 ? SINGLE_ROOT_NOTE = 48;
+    input == KC_TRANSPOSE_RESET_4 ? SINGLE_ROOT_NOTE = 60;
+    input == KC_TRANSPOSE_RESET_5 ? SINGLE_ROOT_NOTE = 72;
+
+    input == KC_TRANSPOSE_UP ? transpose_up();
+    input == KC_TRANSPOSE_DOWN ? transpose_down();
+);
+
+function customFilterCheck(note) (
+    (note < QMK_MAIN_LOW || note > QMK_MAIN_HIGH)
+    && note != QMK_THUMB_L && note != QMK_THUMB_R;
+);
+
+@slider
+  SINGLE_ROOT_NOTE = slider1;
+
+@block
+
+  while (
+      input = midirecv(offset,msg1,msg23);
+      input ? (
+
+        statusHi = (msg1/16)|0;
+        statusLo = (msg1-(statusHi*16))|0;
+        note = msg23&127;
+        vel =(msg23/256)|0;
+
+        // NOTE ONs ////////////////////////////////////////////////////////
+        statusHi == NOTE_ON && vel > 0 ? (
+          filter = customFilterCheck(note);
+          (!filter) ? (
+            // WITHIN FILTER WINDOW -------------------
+            note = SINGLE_ROOT_NOTE;
+            midisend(offset,msg1,note+vel*256);
+
+            ):(
+              // OUTSIDE FILTER WINDOW ------------------
+              WAS_FILTERED[note] = 1;
+
+              transpose(note);
+              /* note == KC_TRANSPOSE_UP ? transpose_up(); */
+              /* note == KC_TRANSPOSE_DOWN ? transpose_down(); */
+              /* note == KC_TRANSP_RESET ? transpose_reset(); */
+              );
+          ):
+
+          // NOTE OFFs /////////////////////////////////////////////////////
+          statusHi == NOTE_OFF || (statusHi == NOTE_ON && vel == 0 ) ? (
+
+              // CHECK WAS FILTERED?
+              WAS_FILTERED[note] ? (
+                WAS_FILTERED[note] = 0;
+                ):(
+                  note = SINGLE_ROOT_NOTE;
+                  midisend(offset,msg1,note+vel*256);
+                  );
+              ) : PASS_THRU_CC ? (
+                // HANDLE MIDI CC ////////////////////////////////////////////
+                midisend(mpos, msg1, msg23);
+                );
+
+              ); // input ? ()
+              input;
+              );
