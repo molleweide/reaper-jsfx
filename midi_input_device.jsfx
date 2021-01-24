@@ -3,15 +3,66 @@ author: molleweide
 version: 1.0
 
 /*
+   LINKS
 
-   TODO
+   - MIDI SPEC: http://www.petesqbsite.com/sections/express/issue18/midifilespart1.html
+   - MIDI TUTORIAL BIG: https://www.admiralbumblebee.com/music/2018/02/08/Write-a-Reaper-MIDI-JSFX-from-scratch.html#for-programmers
+
+   GOAL ////////////////////////////////////
+
+   make it easy to update interaction >> let configs and templates arise over time.
+
+   TODO ////////////////////////////////////
 
    create function that checks for equality of a set of different keys
    eg. noteIs(resetKey)?? where reset could be more than one value. so that I can move keys around the keyboard.
+   >>> add transpose keys to pinky outside
+
+   QMK ////////////////////////////////////
+
+   - single output               XXX
+
+   - full linear mode
+   - move reset keys to thumbs
+   - split note/vel >> hmmm??
+   - split notes
+   - single output
+   action > setup w currently active note in piano roll?
+   - quick changing
+   create a numpad. use note on / note off in order so select numpad selection layer.
+   this could then be used for super fast shifting of the board so that I can
+   by shift/transpose to a note that I want in 2 key strokes.
+   - MIDI EXAMINER > how are the sliders being updated?
+   it would probably be smart to use this same type of setting sliders HERE
+   >>> this allows me to easilly modify parameters w/VIMAC !!!!
+
+   CHANNEL ROUTING ////////////////////////////////////
+
+   1. 16 channels / switch between 16 Group elements
+   2. qmk layers and logic to then decide the channel output of each Group to its children.
+
+
+
+   IMPORT ////////////////////////////////////
+
+   - file > logic tree
+   - file > functions and variables.
+
+   VIM ////////////////////////////////////
+
+   - make eel syntax into plugin >> publish to github
+   - vim indent anything plugin?
+   - article on indentation: http://psy.swansea.ac.uk/staff/carter/vim/vim_indent.htm
+   - make plugin installable with all of the standard plugin managers
+
+   oooh!! it seems it would be possible to create sort of like a mini vim language for setting up the
+   midi instruments that I am using.
 
  */
 
-slider1:48<1,127, 1>: note select
+slider1:48<1,127,1>: note select
+slider2:0<0,2,1{QMK,GRAND_PIANO,DRUMKIT}>MIDI DEVICE
+slider3:0<0,2,1{QMK_SINGLE,QMK_FULL,QMK_SPLIT}>device mode
 
 out_pin:none
 out_pin:none
@@ -25,30 +76,47 @@ WAS_FILTERED = 1024;  // array for storing which notes are filtered
 
 PASS_THRU_CC = 0;
 
-SINGLE_ROOT_NOTE = 24;
+SINGLE_ROOT_NOTE = 24; // use this as the lowest note
+TRANSPOSE_SHIFT = 0;
 
+// device..............
+// MIDI_DEVICE = 0;
 QMK = 0;
-PIANO_GRAND = 1;
-INSTRUMENT = QMK;
+GRAND_PIANO = 1;
 
-// modes
-MODE = 0;
+// modes..........
+QMK_SINGLE_OUT = 1;
+QMK_FULL_LINEAR = 2;
+QMK_SPLIT = 3;
+GRAND_PIANO = 4;
 
-QMK_MAIN_HIGH = 85;
-QMK_MAIN_LOW = 56;
-QMK_THUMB_L = 51;
-QMK_THUMB_R = 52;
+// qmk variables
+QMK_NOTE_SHIFT_NORMALIZE = 36; // i have to look this up
+QMK_FULL_HIGH = 85;
+QMK_FULL_LOW = 48;
+QMK_SINGLE_HIGH = QMK_FULL_HIGH;
+QMK_SINGLE_LOW = 56;
+QMK_THUMB_INNER_L1 = 51;
+QMK_THUMB_INNER_R1 = 52;
+
+// grand piano variables
+GPAND_PIANO_NOTE_SHIFT_NORMALIZE = 12;
+GRAND_PIANO_HIGH = 108;
+GRAND_PIANO_LOW = 24;
 
 
 //TRANSPOSE_RESET = ;
-KC_TRANSPOSE_DOWN = 50;
-KC_TRANSPOSE_UP = 53;
+KC_TRANSPOSE_THUMBS_DOWN = 50;
+KC_TRANSPOSE_THUMBS_UP = 53;
+KC_TRANSPOSE_PINKY_DOWN = 110;
+KC_TRANSPOSE_PINKY_UP = 115;
 KC_TRANSPOSE_RESET_1 = 86;
 KC_TRANSPOSE_RESET_2 = 87;
 KC_TRANSPOSE_RESET_3 = 88;
 KC_TRANSPOSE_RESET_4 = 89;
 KC_TRANSPOSE_RESET_5 = 90;
 
+// check limits:  t < 0 ? t = 0 : t > 127 ? t = 127;
 function transpose_up()(
     SINGLE_ROOT_NOTE < 127 ? (
       SINGLE_ROOT_NOTE += 1;
@@ -59,65 +127,172 @@ function transpose_down()(
       SINGLE_ROOT_NOTE -= 1;
       )
     );
-function transpose(input)(
-    input == KC_TRANSPOSE_RESET_1 ? SINGLE_ROOT_NOTE = 24;
-    input == KC_TRANSPOSE_RESET_2 ? SINGLE_ROOT_NOTE = 36;
-    input == KC_TRANSPOSE_RESET_3 ? SINGLE_ROOT_NOTE = 48;
-    input == KC_TRANSPOSE_RESET_4 ? SINGLE_ROOT_NOTE = 60;
-    input == KC_TRANSPOSE_RESET_5 ? SINGLE_ROOT_NOTE = 72;
 
-    input == KC_TRANSPOSE_UP ? transpose_up();
-    input == KC_TRANSPOSE_DOWN ? transpose_down();
+// rename function to `qmk_handleOtherKeys()`
+function qmh_handleOtherKeys(input)(
+  input == KC_TRANSPOSE_RESET_1 ? SINGLE_ROOT_NOTE = 24;
+  input == KC_TRANSPOSE_RESET_2 ? SINGLE_ROOT_NOTE = 36;
+  input == KC_TRANSPOSE_RESET_3 ? SINGLE_ROOT_NOTE = 48;
+  input == KC_TRANSPOSE_RESET_4 ? SINGLE_ROOT_NOTE = 60;
+  input == KC_TRANSPOSE_RESET_5 ? SINGLE_ROOT_NOTE = 72;
+  input == KC_TRANSPOSE_THUMBS_UP ? transpose_up();
+  input == KC_TRANSPOSE_THUMBS_DOWN ? transpose_down();
+);
+
+// RENAME TO NOTE ON / OFF INPUT GATE ??
+function filter_check(mode, note) (
+    mode == QMK_SINGLE_OUT ? (
+      retval = (note < QMK_SINGLE_LOW || note > QMK_SINGLE_HIGH)
+      && note != QMK_THUMB_INNER_L1 && note != QMK_THUMB_INNER_R1;
     );
+    mode == QMK_FULL_LINEAR || QMK_SPLIT ? (
+      retval = note < QMK_FULL_LOW || note > QMK_FULL_HIGH;
+    );
+    mode == GRAND_PIANO_FULL ? (
+      retval = note < GRAND_PIANO_LOW || note > GRAND_PIANO_HIGH;
+    );
+    retval;
+);
 
-function customFilterCheck(note) (
-      (note < QMK_MAIN_LOW || note > QMK_MAIN_HIGH)
-      && note != QMK_THUMB_L && note != QMK_THUMB_R;
-      );
+// QMK OUTPUT NOTE MAPPING
+function qmk_computeNoteOut(mode, note)(
+    mode == QMK_SINGLE_OUT ? (
+      retval = SINGLE_ROOT_NOTE;// compute retval with transpose shift
+    );
+    mode == QMK_FULL_LINEAR ? (
+      // first subtract shift notes and then add ring
+      tmp_note = note - QMK_NOTE_SHIFT_NORMALIZE;
+      retval = SINGLE_ROOT_NOTE + tmp_note;
+    );
+    mode == QMK_SPLIT ? (
+      // check left / right ???
+      retval = 24;
+    );
+    mode == GRAND_PIANO_FULL ? (
+      tmp_note = note - GPAND_PIANO_NOTE_SHIFT_NORMALIZE;
+      retval = 24;
+    );
+    retval;
+);
+
 
 @slider
-  SINGLE_ROOT_NOTE = slider1;
+SINGLE_ROOT_NOTE = slider1;
+MIDI_DEVICE = slider2;
+MODE = slider3;
 
 @block
 
-  while (
-      input = midirecv(offset,msg1,msg23);
-      input ? (
+// TODO
+//
+//  put midi cc pass thru at the end??
+while (
+    input = midirecv(offset,msg1,msg23);
+    input ? ( // check if current track channel?
 
-        statusHi = (msg1/16)|0;
-        statusLo = (msg1-(statusHi*16))|0;
-        note = msg23&127;
-        vel =(msg23/256)|0;
+      statusHi = (msg1/16)|0;
+      statusLo = (msg1-(statusHi*16))|0;
+      note = msg23&127;
+      vel =(msg23/256)|0;
 
-        // NOTE ONs ////////////////////////////////////////////////////////
-        statusHi == NOTE_ON && vel > 0 ? (
-          filter = customFilterCheck(note);
-          (!filter) ? (
-            // WITHIN FILTER WINDOW -------------------
-            note = SINGLE_ROOT_NOTE;
-            midisend(offset,msg1,note+vel*256);
-            ):(
-              // OUTSIDE FILTER WINDOW ------------------
-              WAS_FILTERED[note] = 1;
-              transpose(note);
-              );
-          ):
+      // QMK ////////////////////////////////////////////////////////////////////
+      MIDI_DEVICE == QMK ? (
+
+        MODE == QMK_SINGLE_OUT ? (
+           // NOTE ONs ////////////////////////////////////////////////////////
+          statusHi == NOTE_ON && vel > 0 ? (
+            filter = filter_check(MODE, note);
+            (!filter) ? (
+              // create a function compute note
+              // note = SINGLE_ROOT_NOTE; // SINGLE_ROOT_NOTE + TRANSPOSE_SHIFT
+              note = qmk_computeNoteOut(MODE, note);
+              midisend(offset,msg1,note+vel*256);
+              ):(
+                WAS_FILTERED[note] = 1;
+                qmh_handleOtherKeys(note);
+                );
+            ):
 
           // NOTE OFFs /////////////////////////////////////////////////////
           statusHi == NOTE_OFF || (statusHi == NOTE_ON && vel == 0 ) ? (
 
-              // CHECK WAS FILTERED?
-              WAS_FILTERED[note] ? (
-                WAS_FILTERED[note] = 0;
-                ):(
-                  note = SINGLE_ROOT_NOTE;
-                  midisend(offset,msg1,note+vel*256);
-                  );
-              ) : PASS_THRU_CC ? (
-                // HANDLE MIDI CC ////////////////////////////////////////////
-                midisend(mpos, msg1, msg23);
+            WAS_FILTERED[note] ? (
+              WAS_FILTERED[note] = 0;
+              ):(
+                //note = SINGLE_ROOT_NOTE; // SINGLE_ROOT_NOTE + TRANSPOSE_SHIFT
+                note = qmk_computeNoteOut(MODE, note);
+                midisend(offset,msg1,note+vel*256);
                 );
+            );
 
+          PASS_THRU_CC ? (
+              midisend(mpos, msg1, msg23);
+              );
+          ); // QMK_SINGLE_OUT
+
+        MODE == QMK_FULL_LINEAR ? (
+              // NOTE ONs ////////////////////////////////////////////////////////
+              statusHi == NOTE_ON && vel > 0 ? (
+                filter = filter_check(MODE, note);
+                (!filter) ? (
+                  note = qmk_computeNoteOut(MODE, note);
+                  midisend(offset,msg1,note+vel*256);
+                  ):(
+                    WAS_FILTERED[note] = 1;
+                    qmh_handleOtherKeys(note);
+                    );
+                ): // NOTE_ON
+
+              // NOTE OFFs /////////////////////////////////////////////////////
+              statusHi == NOTE_OFF || (statusHi == NOTE_ON && vel == 0 ) ? (
+
+                WAS_FILTERED[note] ? (
+                  WAS_FILTERED[note] = 0;
+                  ):(
+                    note = qmk_computeNoteOut(MODE, note);
+                    midisend(offset,msg1,note+vel*256);
+                    );
+                ); // NOTE_OFF
+
+              PASS_THRU_CC ? (
+                  midisend(mpos, msg1, msg23);
+          ); // PASS_THRU_CC
+        ); // QMK_FULL_LINEAR
+        MODE == QMK_SPLIT ? (
+              // NOTE ONs ////////////////////////////////////////////////////////
+              statusHi == NOTE_ON && vel > 0 ? (
+                filter = filter_check(MODE, note);
+                (!filter) ? (
+                  note = qmk_computeNoteOut(MODE, note);
+                  midisend(offset,msg1,note+vel*256);
+                  ):(
+                    WAS_FILTERED[note] = 1;
+                    qmh_handleOtherKeys(note);
+                    );
+                ): // NOTE_ON
+
+              // NOTE OFFs /////////////////////////////////////////////////////
+              statusHi == NOTE_OFF || (statusHi == NOTE_ON && vel == 0 ) ? (
+
+                WAS_FILTERED[note] ? (
+                  WAS_FILTERED[note] = 0;
+                  ):(
+                    note = qmk_computeNoteOut(MODE, note);
+                    midisend(offset,msg1,note+vel*256);
+                    );
+                ); // NOTE_OFF
+
+              PASS_THRU_CC ? (
+                  midisend(mpos, msg1, msg23);
+          ); // PASS_THRU_CC
+        ); // QMK_SPLIT_NOTE_AND_VEL
+              /* MODE == QMK_SPLIT_MULT_CH_OUT ? (); */
+              /* MODE == QMK_DRUM_KIT ? (); */
+              );
+
+              // GRAND_PIANO ////////////////////////////////////////////////////////////////////
+
+              //MIDI_DEVICE == GRAND_PIANO ? (); // MIDI_DEVICE == PIANO
               ); // input ? ()
               input;
               );
