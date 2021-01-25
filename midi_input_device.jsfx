@@ -2,6 +2,8 @@ desc: molleweide custom midi device preprocessor
 author: molleweide
 version: 1.0
 
+import my_functions.jsfx-inc
+
 /*
    LINKS
 
@@ -14,12 +16,6 @@ version: 1.0
 
    TODO ////////////////////////////////////
 
-   - send reset midi message
-      >> on transpore/layer shift release all notes stored in WAS_FILTERED
-      >> update slider on transpose
-
-    - rename all device/mode to start with prefix >> easy handle/read
-
     - split note / vel
       R = single note output
       L = left side outputs velocity
@@ -31,7 +27,7 @@ version: 1.0
 
     - split channel / notes
       L channel switching
-      R = note output
+      R = same note different vel
       >>> transpore should still work.
 
     - split ch/vel/mult note out put
@@ -69,13 +65,14 @@ version: 1.0
 
 slider1:24<1,127,1>ROOT
 slider2:0<0,2,1{QMK,GRAND_PIANO,DRUMKIT}>DEVICE
-slider3:0<0,2,1{QMK_SINGLE,QMK_FULL,QMK_SPLIT,GRAND_PIANO_FULL}>MODE
+slider3:0<0,2,1{QMK_SINGLE,QMK_FULL,QMK_SPLIT,GRAND_FULL,QMK_SPLIT_CH}>MODE
 
 out_pin:none
 out_pin:none
 
 @init
 
+// midi help...
 NOTE_OFF = 8;
 NOTE_ON = 9;
 
@@ -83,8 +80,9 @@ WAS_FILTERED = 1024;  // array for storing which notes are filtered
 
 PASS_THRU_CC = 0;
 
+
+// GLOBAL OPTIONS
 SINGLE_ROOT_NOTE = 24; // reset transpose by setting this to 24
-TRANSPOSE_SHIFT = 0;
 
 // device..............
 // MIDI_DEVICE = 0;
@@ -92,10 +90,11 @@ DEVICE_QMK = 0;
 DEVICE_GRAND_PIANO = 1;
 
 // modes..........
-QMK_SINGLE_OUT = 0;
-QMK_FULL_LINEAR = 1;
-QMK_SPLIT = 2;
-GRAND_PIANO_FULL_MODE = 3;
+MODE_QMK_SINGLE_BASIC = 0;
+MODE_QMK_FULL_LINEAR = 1;
+MODE_QMK_SPLIT_VEL_NOTE = 2;
+MODE_GRAND_PIANO_FULL = 3;
+MODE_QMK_SPLIT_MULT_CH = 4;
 
 // qmk variables
 QMK_NOTE_SHIFT_NORMALIZE = 48; // i have to look this up
@@ -129,21 +128,28 @@ GRAND_PIANO_HIGH = 108;
 GRAND_PIANO_LOW = 33;
 
 
-//TRANSPOSE_RESET = ;
-KC_TRANSPOSE_THUMBS_DOWN = 50;
-KC_TRANSPOSE_THUMBS_UP = 53;
-KC_TRANSPOSE_PINKY_DOWN = 110;
-KC_TRANSPOSE_PINKY_UP = 115;
-KC_TRANSPOSE_RESET_1 = 86;
-KC_TRANSPOSE_RESET_2 = 87;
-KC_TRANSPOSE_RESET_3 = 88;
-KC_TRANSPOSE_RESET_4 = 89;
-KC_TRANSPOSE_RESET_5 = 90;
+// qmk command keys
+KC_QMK_TRANSPOSE_THUMBS_DOWN = 50;
+KC_QMK_TRANSPOSE_THUMBS_UP = 53;
+KC_QMK_TRANSPOSE_PINKY_DOWN = 110;
+KC_QMK_TRANSPOSE_PINKY_UP = 115;
+KC_QMK_TRANSPOSE_RESET_1 = 86;
+KC_QMK_TRANSPOSE_RESET_2 = 87;
+KC_QMK_TRANSPOSE_RESET_3 = 88;
+KC_QMK_TRANSPOSE_RESET_4 = 89;
+KC_QMK_TRANSPOSE_RESET_5 = 90;
 
+// grand piano command keys
 KC_GRAND_TRANSPOSE_UP = 25;
 KC_GRAND_TRANSPOSE_DOWN = 24;
 KC_GRAND_TRANSPOSE_RESET = 26;
 KC_GRAND_RESET_ALL_NOTES = 27;
+
+
+////////////////////////////////////////////////////////////////////
+// FUNCTIONS ///////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+
 
 // check limits:  t < 0 ? t = 0 : t > 127 ? t = 127;
 function transpose_up()(
@@ -169,25 +175,25 @@ function resetAllNotes()(
 
 // rename function to `qmk_handleOtherKeys()`
 function qmh_handleOtherKeys(mode, input)(
-    ( mode == QMK_SINGLE_OUT || mode == QMK_FULL_LINEAR || mode == QMK_SPLIT ) ? (
-      input == KC_TRANSPOSE_RESET_1 ? SINGLE_ROOT_NOTE = 24;
-      input == KC_TRANSPOSE_RESET_2 ? SINGLE_ROOT_NOTE = 36;
-      input == KC_TRANSPOSE_RESET_3 ? SINGLE_ROOT_NOTE = 48;
-      input == KC_TRANSPOSE_RESET_4 ? SINGLE_ROOT_NOTE = 60;
-      input == KC_TRANSPOSE_RESET_5 ? SINGLE_ROOT_NOTE = 72;
-      input == KC_TRANSPOSE_PINKY_UP ? transpose_up();
-      input == KC_TRANSPOSE_PINKY_DOWN ? transpose_down();
+    ( mode == MODE_QMK_SINGLE_BASIC || mode == MODE_QMK_FULL_LINEAR || mode == MODE_QMK_SPLIT ) ? (
+      input == KC_QMK_TRANSPOSE_RESET_1 ? SINGLE_ROOT_NOTE = 24;
+      input == KC_QMK_TRANSPOSE_RESET_2 ? SINGLE_ROOT_NOTE = 36;
+      input == KC_QMK_TRANSPOSE_RESET_3 ? SINGLE_ROOT_NOTE = 48;
+      input == KC_QMK_TRANSPOSE_RESET_4 ? SINGLE_ROOT_NOTE = 60;
+      input == KC_QMK_TRANSPOSE_RESET_5 ? SINGLE_ROOT_NOTE = 72;
+      input == KC_QMK_TRANSPOSE_PINKY_UP ? transpose_up();
+      input == KC_QMK_TRANSPOSE_PINKY_DOWN ? transpose_down();
     );
 
-    mode == QMK_SINGLE_OUT ? (
-      input == KC_TRANSPOSE_THUMBS_UP ? transpose_up();
-      input == KC_TRANSPOSE_THUMBS_DOWN? transpose_down();
+    mode == MODE_QMK_SINGLE_BASIC ? (
+      input == KC_QMK_TRANSPOSE_THUMBS_UP ? transpose_up();
+      input == KC_QMK_TRANSPOSE_THUMBS_DOWN? transpose_down();
     );
     resetAllNotes();
 );
 
 function grand_handleOtherKeys(mode, input)(
-  mode == GRAND_PIANO_FULL_MODE ? (
+  mode == MODE_GRAND_PIANO_FULL ? (
       input == KC_GRAND_TRANSPOSE_RESET ? SINGLE_ROOT_NOTE = 24;
       input == KC_GRAND_RESET_ALL_NOTES ? resetAllNotes();
       input == KC_GRAND_TRANSPOSE_UP ? transpose_up();
@@ -197,21 +203,21 @@ function grand_handleOtherKeys(mode, input)(
 );
 // RENAME TO NOTE ON / OFF INPUT GATE ??
 function filter_check(mode, note) (
-    mode == QMK_SINGLE_OUT ? (
+    mode == MODE_QMK_SINGLE_BASIC ? (
       retval = (note < QMK_SINGLE_LOW || note > QMK_SINGLE_HIGH)
       && note != QMK_THUMB_INNER_L1 && note != QMK_THUMB_INNER_R1;
     );
-    (mode == QMK_FULL_LINEAR || mode == QMK_SPLIT) ? (
+    (mode == MODE_QMK_FULL_LINEAR || mode == MODE_QMK_SPLIT_VEL_NOTE || mode == MODE_QMK_SPLIT_MULT_CH) ? (
       retval = note < QMK_FULL_LOW || note > QMK_FULL_HIGH;
     );
-    mode == GRAND_PIANO_FULL_MODE ? (
+    mode == MODE_GRAND_PIANO_FULL ? (
       retval = note < GRAND_PIANO_LOW || note > GRAND_PIANO_HIGH;
     );
     retval;
 );
 
 // incoming notes range from 0 - 37
-function qmk_mapSplitNotes(note)(
+function qmk_mapSplitNotesSingle(note)(
   // TODO
   //
   //  create function numInRange() ???
@@ -255,22 +261,29 @@ function qmk_mapSplitNotes(note)(
 
 // QMK OUTPUT NOTE MAPPING
 function qmk_computeNoteOut(mode, note)(
-    mode == QMK_SINGLE_OUT ? (
+    mode == MODE_QMK_SINGLE_BASIC ? (
       retval = SINGLE_ROOT_NOTE;// compute retval with transpose shift
     );
-    mode == QMK_FULL_LINEAR ? (
+    mode == MODE_QMK_FULL_LINEAR ? (
       // first subtract shift notes and then add ring
       tmp_note = note - QMK_NOTE_SHIFT_NORMALIZE;
       retval = SINGLE_ROOT_NOTE + tmp_note;
     );
-    mode == QMK_SPLIT ? (
-      retval = qmk_mapSplitNotes(note);
+    mode == MODE_QMK_SPLIT_VEL_NOTE ? (
+      retval = qmk_mapSplitNotesSingle(note);
+    );
+    mode == MODE_QMK_SPLIT_MULT_CH ? (
+      retval = qmk_mapSplitNotesSingle(note); // TODO <<<<<<<<<<<<<
     );
     retval;
 );
 
+function qmk_computeVelOut(mode, note)(
+  return = mode;
+);
+
 function grand_computeNoteOut(mode, note)(
-    mode == GRAND_PIANO_FULL_MODE ? (
+    mode == MODE_GRAND_PIANO_FULL ? (
        retval = SINGLE_ROOT_NOTE + note - GPAND_PIANO_NOTE_SHIFT_NORMALIZE;
     );
     retval;
@@ -282,13 +295,9 @@ MIDI_DEVICE = slider2;
 MODE = slider3;
 
 @block
-
-// TODO
-//
-//  put midi cc pass thru at the end??
 while (
     input = midirecv(offset,msg1,msg23);
-    input ? ( // check if current track channel?
+    input ? (
 
       statusHi = (msg1/16)|0;
       statusLo = (msg1-(statusHi*16))|0;
@@ -298,13 +307,12 @@ while (
       // QMK ////////////////////////////////////////////////////////////////////
       MIDI_DEVICE == DEVICE_QMK ? (
 
-        MODE == QMK_SINGLE_OUT ? (
+        MODE == MODE_QMK_SINGLE_BASIC ? (
            // NOTE ONs ////////////////////////////////////////////////////////
           statusHi == NOTE_ON && vel > 0 ? (
             filter = filter_check(MODE, note);
             (!filter) ? (
               // create a function compute note
-              // note = SINGLE_ROOT_NOTE; // SINGLE_ROOT_NOTE + TRANSPOSE_SHIFT
               note = qmk_computeNoteOut(MODE, note);
               midisend(offset,msg1,note+vel*256);
               ):(
@@ -319,7 +327,6 @@ while (
             WAS_FILTERED[note] ? (
               WAS_FILTERED[note] = 0;
               ):(
-                //note = SINGLE_ROOT_NOTE; // SINGLE_ROOT_NOTE + TRANSPOSE_SHIFT
                 note = qmk_computeNoteOut(MODE, note);
                 midisend(offset,msg1,note+vel*256);
                 );
@@ -328,9 +335,9 @@ while (
           PASS_THRU_CC ? (
               midisend(mpos, msg1, msg23);
               );
-          ); // QMK_SINGLE_OUT
+          ); // MODE_QMK_SINGLE_BASIC
 
-        MODE == QMK_FULL_LINEAR ? (
+        MODE == MODE_QMK_FULL_LINEAR ? (
               // NOTE ONs ////////////////////////////////////////////////////////
               statusHi == NOTE_ON && vel > 0 ? (
                 filter = filter_check(MODE, note);
@@ -357,8 +364,38 @@ while (
               PASS_THRU_CC ? (
                   midisend(mpos, msg1, msg23);
           ); // PASS_THRU_CC
-        ); // QMK_FULL_LINEAR
-        MODE == QMK_SPLIT ? (
+        ); // MODE_QMK_FULL_LINEAR
+        MODE == MODE_QMK_SPLIT_VEL_NOTE ? (
+              // NOTE ONs ////////////////////////////////////////////////////////
+              statusHi == NOTE_ON && vel > 0 ? (
+                filter = filter_check(MODE, note);
+                (!filter) ? (
+                  note = qmk_computeNoteOut(MODE, note);
+                  /* vel = qmk_computeVelOut(MODE, note); */
+                  midisend(offset,msg1,note+vel*256);
+                  ):(
+                    WAS_FILTERED[note] = 1;
+                    qmh_handleOtherKeys(MODE,note);
+                    );
+                ): // NOTE_ON
+
+              // NOTE OFFs /////////////////////////////////////////////////////
+              statusHi == NOTE_OFF || (statusHi == NOTE_ON && vel == 0 ) ? (
+
+                WAS_FILTERED[note] ? (
+                  WAS_FILTERED[note] = 0;
+                  ):(
+                    note = qmk_computeNoteOut(MODE, note);
+                    midisend(offset,msg1,note+vel*256);
+                    );
+                ); // NOTE_OFF
+
+              PASS_THRU_CC ? (
+                  midisend(mpos, msg1, msg23);
+          ); // PASS_THRU_CC
+        ); // MODE_QMK_SPLIT_NOTE_AND_VEL
+
+        MODE == MODE_QMK_SPLIT_MULT_CH ? (
               // NOTE ONs ////////////////////////////////////////////////////////
               statusHi == NOTE_ON && vel > 0 ? (
                 filter = filter_check(MODE, note);
@@ -385,15 +422,12 @@ while (
               PASS_THRU_CC ? (
                   midisend(mpos, msg1, msg23);
           ); // PASS_THRU_CC
-        ); // QMK_SPLIT_NOTE_AND_VEL
-              /* MODE == QMK_SPLIT_MULT_CH_OUT ? (); */
-              /* MODE == QMK_DRUM_KIT ? (); */
-              );
-
+        ); // MODE_QMK_SPLIT_NOTE_AND_VEL
+      );
               // GRAND_PIANO ////////////////////////////////////////////////////////////////////
 
           MIDI_DEVICE == DEVICE_GRAND_PIANO ? (
-              MODE == GRAND_PIANO_FULL_MODE ? (
+              MODE == MODE_GRAND_PIANO_FULL ? (
                       // NOTE ONs ////////////////////////////////////////////////////////
                       statusHi == NOTE_ON && vel > 0 ? (
                         filter = filter_check(MODE, note);
@@ -424,4 +458,4 @@ while (
                 ); // DEVICE_GRAND_PIANO
               ); // input ? ()
               input;
-              );
+);
