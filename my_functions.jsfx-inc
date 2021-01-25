@@ -119,7 +119,6 @@ function qmk_insideRightSide(note)(
 
 // rename to check if note inside left or right side
 function qmk_mapSplitNotesSingle(note)(
-
   // TODO
   // I have to test
   //    >>>> return values 0 - 18
@@ -182,26 +181,27 @@ function qmk_computeNoteOut(mode, note)(
       retval = SINGLE_ROOT_NOTE + tmp_note;
     );
     mode == MODE_QMK_SPLIT_VEL_NOTE ? (
-      // only want right side here
+      // only check for right side here
       retval = qmk_mapSplitNotesSingle(note); // + SINGLE_ROOT_NOTE <<<<<<<<<<
     );
     mode == MODE_QMK_SPLIT_MULT_CH ? (
+      // only check for right side here
       retval = qmk_mapSplitNotesSingle(note); // TODO <<<<<<<<<<<<<
     );
     retval;
 );
 
 
-function qmk_getLeftHandVelFromNoteIn(note)(
-  retval;
-);
+/* function qmk_getLeftHandVelFromNoteIn(note)( */
+/*   retval; */
+/* ); */
 
-function qmk_getVelOut(mode, note)(
-  mode == MODE_QMK_SPLIT_VEL_NOTE ? (
-    retval = qmk_getLeftHandVelFromNoteIn(note);
-  );
-  retval;
-);
+/* function qmk_getVelOut(mode, note)( */
+/*   mode == MODE_QMK_SPLIT_VEL_NOTE ? ( */
+/*     retval = qmk_getLeftHandVelFromNoteIn(note); */
+/*   ); */
+/*   retval; */
+/* ); */
 
 function grand_computeNoteOut(mode, note)(
     mode == MODE_GRAND_PIANO_FULL ? (

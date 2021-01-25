@@ -13,27 +13,18 @@ import my_functions.jsfx-inc
 
    TODO ////////////////////////////////////
 
-   - 
+   - retrieve note back into filter >> reduce computations by 50%
 
-    - refactor main loop into one branch per device.
+   - MODE_QMK_SPLIT_VEL_NOTE
+        make sure I only get note output for right side with
 
-   - how can I set VEL / CH global ?
-        filterCheck >> only allow through notes
-          vel_note > check if note in right hand
-            return true
-        !filter
-          get computed note
-        filter
-          other func
-            if vel_note > set GLOBAL_VELOCITY_OUT by left hand
-            if ch_note > set GLOBAL_CHANNEL_OUT by left hand
+    - qmh_handleOtherKeys
+          set GLOBAL_VEL / GLOBAL_CH
 
+    - inside L/R hand AND handleOtherKeys
+        chain if/else so that I don't do checks for all if one is true
 
-        in the filtered area
-          set global_vel/global_ch
-          use these global variables for QMK
-
-      split up files by device > put all qmk vars in qmk_functions, grand etc..
+      - split up files by device > put all qmk vars in qmk_functions, grand etc..
 
     - split note / vel
       R = single note output
@@ -116,23 +107,26 @@ while (
 
       // QMK ////////////////////////////////////////////////////////////////////
       MIDI_DEVICE == DEVICE_QMK ? (
-
-        MODE == MODE_QMK_SINGLE_BASIC ? (
            // NOTE ONs ////////////////////////////////////////////////////////
           statusHi == NOTE_ON && vel > 0 ? (
+
+            // I could return the note value back into `filter`
+            // >>> reduce computations by /2
+            //
+            //  note > 0 ? ()
+
+
             filter = filter_check(MODE, note);
             (!filter) ? (
               note = qmk_computeNoteOut(MODE, note);
               midisend(offset,msg1,note+vel*256); // GLOBAL_CH / GLOBAL_VEL
               ):(
                 WAS_FILTERED[note] = 1;
-                qmh_handleOtherKeys(MODE,note);
+                qmh_handleOtherKeys(MODE,note); // set global_vel / global_ch here
                 );
             ):
-
           // NOTE OFFs /////////////////////////////////////////////////////
           statusHi == NOTE_OFF || (statusHi == NOTE_ON && vel == 0 ) ? (
-
             WAS_FILTERED[note] ? (
               WAS_FILTERED[note] = 0;
               ):(
@@ -144,126 +138,37 @@ while (
           PASS_THRU_CC ? (
               midisend(mpos, msg1, msg23);
               );
-          ); // MODE_QMK_SINGLE_BASIC
-
-        MODE == MODE_QMK_FULL_LINEAR ? (
-              // NOTE ONs ////////////////////////////////////////////////////////
-              statusHi == NOTE_ON && vel > 0 ? (
-                filter = filter_check(MODE, note);
-                (!filter) ? (
-                  note = qmk_computeNoteOut(MODE, note);
-                  midisend(offset,msg1,note+vel*256);
-                  ):(
-                    WAS_FILTERED[note] = 1;
-                    qmh_handleOtherKeys(MODE,note);
-                    );
-                ): // NOTE_ON
-
-              // NOTE OFFs /////////////////////////////////////////////////////
-              statusHi == NOTE_OFF || (statusHi == NOTE_ON && vel == 0 ) ? (
-
-                WAS_FILTERED[note] ? (
-                  WAS_FILTERED[note] = 0;
-                  ):(
-                    note = qmk_computeNoteOut(MODE, note);
-                    midisend(offset,msg1,note+vel*256);
-                    );
-                ); // NOTE_OFF
-
-              PASS_THRU_CC ? (
-                  midisend(mpos, msg1, msg23);
-          ); // PASS_THRU_CC
-        ); // MODE_QMK_FULL_LINEAR
-        MODE == MODE_QMK_SPLIT_VEL_NOTE ? (
-              // NOTE ONs ////////////////////////////////////////////////////////
-              statusHi == NOTE_ON && vel > 0 ? (
-                filter = filter_check(MODE, note); // i check mode...good!
-                (!filter) ? (
-                  note = qmk_computeNoteOut(MODE, note);
-                  midisend(offset,msg1,note+GLOBAL_VEL*256);
-                  ):(
-                    WAS_FILTERED[note] = 1;
-                    qmh_handleOtherKeys(MODE,note);
-                    );
-                ): // NOTE_ON
-
-              // NOTE OFFs /////////////////////////////////////////////////////
-              statusHi == NOTE_OFF || (statusHi == NOTE_ON && vel == 0 ) ? (
-
-                WAS_FILTERED[note] ? (
-                  WAS_FILTERED[note] = 0;
-                  ):(
-                    note = qmk_computeNoteOut(MODE, note);
-                    midisend(offset,msg1,note+vel*256);
-                    );
-                ); // NOTE_OFF
-
-              PASS_THRU_CC ? (
-                  midisend(mpos, msg1, msg23);
-          ); // PASS_THRU_CC
-        ); // MODE_QMK_SPLIT_NOTE_AND_VEL
-
-        MODE == MODE_QMK_SPLIT_MULT_CH ? (
-              // NOTE ONs ////////////////////////////////////////////////////////
-              statusHi == NOTE_ON && vel > 0 ? (
-                filter = filter_check(MODE, note);
-                (!filter) ? (
-                  note = qmk_computeNoteOut(MODE, note);
-                  midisend(offset,msg1,note+vel*256);
-                  ):(
-                    WAS_FILTERED[note] = 1;
-                    qmh_handleOtherKeys(MODE,note);
-                    );
-                ): // NOTE_ON
-
-              // NOTE OFFs /////////////////////////////////////////////////////
-              statusHi == NOTE_OFF || (statusHi == NOTE_ON && vel == 0 ) ? (
-
-                WAS_FILTERED[note] ? (
-                  WAS_FILTERED[note] = 0;
-                  ):(
-                    note = qmk_computeNoteOut(MODE, note);
-                    midisend(offset,msg1,note+vel*256);
-                    );
-                ); // NOTE_OFF
-
-              PASS_THRU_CC ? (
-                  midisend(mpos, msg1, msg23);
-          ); // PASS_THRU_CC
-        ); // MODE_QMK_SPLIT_NOTE_AND_VEL
       );
               // GRAND_PIANO ////////////////////////////////////////////////////////////////////
 
       MIDI_DEVICE == DEVICE_GRAND_PIANO ? (
-              MODE == MODE_GRAND_PIANO_FULL ? (
-                      // NOTE ONs ////////////////////////////////////////////////////////
-                      statusHi == NOTE_ON && vel > 0 ? (
-                        filter = filter_check(MODE, note);
-                        (!filter) ? (
-                          note = grand_computeNoteOut(MODE, note);
-                          midisend(offset,msg1,note+vel*256);
-                          ):(
-                            WAS_FILTERED[note] = 1;
-                            grand_handleOtherKeys(MODE,note);
-                            );
-                        ): // NOTE_ON
+              // NOTE ONs ////////////////////////////////////////////////////////
+              statusHi == NOTE_ON && vel > 0 ? (
+                filter = filter_check(MODE, note);
+                (!filter) ? (
+                  note = grand_computeNoteOut(MODE, note);
+                  midisend(offset,msg1,note+vel*256);
+                  ):(
+                    WAS_FILTERED[note] = 1;
+                    grand_handleOtherKeys(MODE,note);
+                    );
+                ): // NOTE_ON
 
-                      // NOTE OFFs /////////////////////////////////////////////////////
-                      statusHi == NOTE_OFF || (statusHi == NOTE_ON && vel == 0 ) ? (
+              // NOTE OFFs /////////////////////////////////////////////////////
+              statusHi == NOTE_OFF || (statusHi == NOTE_ON && vel == 0 ) ? (
 
-                        WAS_FILTERED[note] ? (
-                          WAS_FILTERED[note] = 0;
-                          ):(
-                            note = grand_computeNoteOut(MODE, note);
-                            midisend(offset,msg1,note+vel*256);
-                            );
-                        ); // NOTE_OFF
+                WAS_FILTERED[note] ? (
+                  WAS_FILTERED[note] = 0;
+                  ):(
+                    note = grand_computeNoteOut(MODE, note);
+                    midisend(offset,msg1,note+vel*256);
+                    );
+                ); // NOTE_OFF
 
-                      PASS_THRU_CC ? (
-                          midisend(mpos, msg1, msg23);
-                      ); // PASS_THRU_CC
-                  ); // MODE_GRAND_PIANO_FULL
-                ); // DEVICE_GRAND_PIANO
-              ); // input ? ()
-              input;
+              PASS_THRU_CC ? (
+                  midisend(mpos, msg1, msg23);
+              ); // PASS_THRU_CC
+        ); // DEVICE_GRAND_PIANO
+      ); // input ? ()
+    input;
 );
