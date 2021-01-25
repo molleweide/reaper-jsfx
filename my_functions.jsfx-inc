@@ -1,18 +1,5 @@
 @init
 
-// check limits:  t < 0 ? t = 0 : t > 127 ? t = 127;
-function transpose_up()(
-    SINGLE_ROOT_NOTE < 127 ? (
-      SINGLE_ROOT_NOTE += 1;
-      );
-);
-
-function transpose_down()(
-    SINGLE_ROOT_NOTE > 0 ? (
-      SINGLE_ROOT_NOTE -= 1;
-      );
-);
-
 function resetAllNotes()(
   // loop through all notes
   loop(127,
@@ -22,25 +9,47 @@ function resetAllNotes()(
   );
 );
 
+// check limits:  t < 0 ? t = 0 : t > 127 ? t = 127;
+function transpose_up()(
+    SINGLE_ROOT_NOTE < 127 ? (
+      SINGLE_ROOT_NOTE += 1;
+      );
+  resetAllNotes();
+);
+
+function transpose_down()(
+    SINGLE_ROOT_NOTE > 0 ? (
+      SINGLE_ROOT_NOTE -= 1;
+      );
+  resetAllNotes();
+);
+
+
 
 // rename function to `qmk_handleOtherKeys()`
 function qmh_handleOtherKeys(mode, input)(
-    ( mode == MODE_QMK_SINGLE_BASIC || mode == MODE_QMK_FULL_LINEAR || mode == MODE_QMK_SPLIT ) ? (
-      input == KC_QMK_TRANSPOSE_RESET_1 ? SINGLE_ROOT_NOTE = 24;
-      input == KC_QMK_TRANSPOSE_RESET_2 ? SINGLE_ROOT_NOTE = 36;
-      input == KC_QMK_TRANSPOSE_RESET_3 ? SINGLE_ROOT_NOTE = 48;
-      input == KC_QMK_TRANSPOSE_RESET_4 ? SINGLE_ROOT_NOTE = 60;
-      input == KC_QMK_TRANSPOSE_RESET_5 ? SINGLE_ROOT_NOTE = 72;
-      input == KC_QMK_TRANSPOSE_PINKY_UP ? transpose_up();
-      input == KC_QMK_TRANSPOSE_PINKY_DOWN ? transpose_down();
-    );
+
+    // if MODE_QMK_SPLIT_VEL_NOTE
+      // if left hand
+        // set GLOBAL_VEL
+    // if MODE_QMK_SPLIT_MULT_CH
+      // if left hand
+        // set GLOBAL_CH
+
 
     mode == MODE_QMK_SINGLE_BASIC ? (
       input == KC_QMK_TRANSPOSE_THUMBS_UP ? transpose_up();
       input == KC_QMK_TRANSPOSE_THUMBS_DOWN? transpose_down();
     );
-    resetAllNotes();
+    input == KC_QMK_TRANSPOSE_RESET_1 ? SINGLE_ROOT_NOTE = 24;resetAllNotes();
+    input == KC_QMK_TRANSPOSE_RESET_2 ? SINGLE_ROOT_NOTE = 36;resetAllNotes();
+    input == KC_QMK_TRANSPOSE_RESET_3 ? SINGLE_ROOT_NOTE = 48;resetAllNotes();
+    input == KC_QMK_TRANSPOSE_RESET_4 ? SINGLE_ROOT_NOTE = 60;resetAllNotes();
+    input == KC_QMK_TRANSPOSE_RESET_5 ? SINGLE_ROOT_NOTE = 72;resetAllNotes();
+    input == KC_QMK_TRANSPOSE_PINKY_UP ? transpose_up();
+    input == KC_QMK_TRANSPOSE_PINKY_DOWN ? transpose_down();
 
+    resetAllNotes(); // mv to if press KC_QMK_RESET_ALL_MIDI
 );
 
 function grand_handleOtherKeys(mode, input)(
@@ -67,11 +76,63 @@ function filter_check(mode, note) (
     retval;
 );
 
-// incoming notes range from 0 - 37
+function qmk_insideLeftSide(note)(
+  retval = 0;
+    (QMK_ROW_HIGH_L_START <= note && note <= QMK_ROW_HIGH_L_END) ? (
+      retval = note - QMK_NOTE_SHIFT_NORMALIZE - 14;
+      /* tmp_note = note - QMK_NOTE_SHIFT_NORMALIZE; */
+    );
+    (QMK_ROW_MID_L_START <= note && note <= QMK_ROW_MID_L_END) ? (
+      retval = note - QMK_NOTE_SHIFT_NORMALIZE - 9;
+    );
+    (QMK_ROW_LOW_L_START <= note && note <= QMK_ROW_LOW_L_END) ? (
+      retval = note - QMK_NOTE_SHIFT_NORMALIZE - 4;
+    );
+    (QMK_ROW_BOTTOM_L_START <= note && note <= QMK_ROW_BOTTOM_L_END) ? (
+      retval = note - QMK_NOTE_SHIFT_NORMALIZE;
+    );
+    QMK_THUMB_INNER_L1 == note ? (
+      retval = note - QMK_NOTE_SHIFT_NORMALIZE;
+    );
+  retval;
+);
+
+function qmk_insideRightSide(note)(
+  retval = 0;
+    (QMK_ROW_HIGH_R_START <= note && note <= QMK_ROW_HIGH_R_END) ? (
+      retval = note - QMK_NOTE_SHIFT_NORMALIZE - 19;
+    );
+    (QMK_ROW_MID_R_START <= note && note <= QMK_ROW_MID_R_END) ? (
+      retval = note - QMK_NOTE_SHIFT_NORMALIZE - 14;
+    );
+    (QMK_ROW_LOW_R_START <= note && note <= QMK_ROW_LOW_R_END) ? (
+      retval = note - QMK_NOTE_SHIFT_NORMALIZE - 9;
+    );
+    (QMK_ROW_BOTTOM_R_START <= note && note <= QMK_ROW_BOTTOM_R_END) ? (
+      retval = note - QMK_NOTE_SHIFT_NORMALIZE - 4;
+    );
+    QMK_THUMB_INNER_R1 == note ? (
+      retval = note - QMK_NOTE_SHIFT_NORMALIZE - 4;
+    );
+  retval;
+);
+
+// rename to check if note inside left or right side
 function qmk_mapSplitNotesSingle(note)(
+
   // TODO
+  // I have to test
+  //    >>>> return values 0 - 18
+  //      add SINGLE_ROOT_NOTE outside
   //
-  //  create function numInRange() ???
+  //    getting back 0-18 is better because then
+  //    i can scale for velocity / ch / note
+  //      by doing stuff with the information outside
+
+    // leftside = qmk_insideLeftSide(note);
+    // rightside = qmk_insideRightSide(note);
+    // leftside > 0 ? ( retval = leftside; ) : // else if
+    // rightside > 0 ? ( retval = leftside );
 
     // left side //////////////////
     (QMK_ROW_HIGH_L_START <= note && note <= QMK_ROW_HIGH_L_END) ? (
@@ -121,7 +182,8 @@ function qmk_computeNoteOut(mode, note)(
       retval = SINGLE_ROOT_NOTE + tmp_note;
     );
     mode == MODE_QMK_SPLIT_VEL_NOTE ? (
-      retval = qmk_mapSplitNotesSingle(note);
+      // only want right side here
+      retval = qmk_mapSplitNotesSingle(note); // + SINGLE_ROOT_NOTE <<<<<<<<<<
     );
     mode == MODE_QMK_SPLIT_MULT_CH ? (
       retval = qmk_mapSplitNotesSingle(note); // TODO <<<<<<<<<<<<<
