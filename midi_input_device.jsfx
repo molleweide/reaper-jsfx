@@ -85,17 +85,34 @@ QMK = 0;
 GRAND_PIANO = 1;
 
 // modes..........
-QMK_SINGLE_OUT = 1;
-QMK_FULL_LINEAR = 2;
-QMK_SPLIT = 3;
-GRAND_PIANO = 4;
+QMK_SINGLE_OUT = 0;
+QMK_FULL_LINEAR = 1;
+QMK_SPLIT = 2;
+GRAND_PIANO_FULL_MODE = 3;
 
 // qmk variables
-QMK_NOTE_SHIFT_NORMALIZE = 36; // i have to look this up
+QMK_NOTE_SHIFT_NORMALIZE = 48; // i have to look this up
 QMK_FULL_HIGH = 85;
 QMK_FULL_LOW = 48;
 QMK_SINGLE_HIGH = QMK_FULL_HIGH;
 QMK_SINGLE_LOW = 56;
+
+QMK_ROW_HIGH_L_START = 76;
+QMK_ROW_HIGH_L_END = 80;
+QMK_ROW_HIGH_R_START = 81;
+QMK_ROW_HIGH_R_END = 85;
+QMK_ROW_MID_L_start = 66;
+QMK_ROW_MID_L_end = 70;
+QMK_ROW_MID_R_start = 71;
+QMK_ROW_MID_R_end = 75;
+QMK_ROW_LOW_L_START = 56;
+QMK_ROW_LOW_L_END = 60;
+QMK_ROW_LOW_R_START = 61;
+QMK_ROW_LOW_R_END = 65; ////////////////////////////
+QMK_ROW_BOTTOM_L_START = 48; /////////////////////////
+QMK_ROW_BOTTOM_L_END = 50;
+QMK_ROW_BOTTOM_R_START = 53;
+QMK_ROW_BOTTOM_R_END = 55;
 QMK_THUMB_INNER_L1 = 51;
 QMK_THUMB_INNER_R1 = 52;
 
@@ -129,14 +146,21 @@ function transpose_down()(
     );
 
 // rename function to `qmk_handleOtherKeys()`
-function qmh_handleOtherKeys(input)(
-  input == KC_TRANSPOSE_RESET_1 ? SINGLE_ROOT_NOTE = 24;
-  input == KC_TRANSPOSE_RESET_2 ? SINGLE_ROOT_NOTE = 36;
-  input == KC_TRANSPOSE_RESET_3 ? SINGLE_ROOT_NOTE = 48;
-  input == KC_TRANSPOSE_RESET_4 ? SINGLE_ROOT_NOTE = 60;
-  input == KC_TRANSPOSE_RESET_5 ? SINGLE_ROOT_NOTE = 72;
-  input == KC_TRANSPOSE_THUMBS_UP ? transpose_up();
-  input == KC_TRANSPOSE_THUMBS_DOWN ? transpose_down();
+function qmh_handleOtherKeys(mode, input)(
+    ( mode == QMK_SINGLE_OUT || mode == QMK_FULL_LINEAR || mode == QMK_SPLIT ) ? (
+      input == KC_TRANSPOSE_RESET_1 ? SINGLE_ROOT_NOTE = 24;
+      input == KC_TRANSPOSE_RESET_2 ? SINGLE_ROOT_NOTE = 36;
+      input == KC_TRANSPOSE_RESET_3 ? SINGLE_ROOT_NOTE = 48;
+      input == KC_TRANSPOSE_RESET_4 ? SINGLE_ROOT_NOTE = 60;
+      input == KC_TRANSPOSE_RESET_5 ? SINGLE_ROOT_NOTE = 72;
+      input == KC_TRANSPOSE_PINKY_UP ? transpose_up();
+      input == KC_TRANSPOSE_PINKY_DOWN ? transpose_down();
+    );
+
+    mode == QMK_SINGLE_OUT ? (
+      input == KC_TRANSPOSE_THUMBS_UP ? transpose_up();
+      input == KC_TRANSPOSE_THUMBS_DOWN? transpose_down();
+    );
 );
 
 // RENAME TO NOTE ON / OFF INPUT GATE ??
@@ -145,13 +169,52 @@ function filter_check(mode, note) (
       retval = (note < QMK_SINGLE_LOW || note > QMK_SINGLE_HIGH)
       && note != QMK_THUMB_INNER_L1 && note != QMK_THUMB_INNER_R1;
     );
-    mode == QMK_FULL_LINEAR || QMK_SPLIT ? (
+    (mode == QMK_FULL_LINEAR || mode == QMK_SPLIT) ? (
       retval = note < QMK_FULL_LOW || note > QMK_FULL_HIGH;
     );
-    mode == GRAND_PIANO_FULL ? (
+    mode == GRAND_PIANO_FULL_MODE ? (
       retval = note < GRAND_PIANO_LOW || note > GRAND_PIANO_HIGH;
     );
     retval;
+);
+
+// incoming notes range from 0 - 37
+function qmk_mapSplitNotes(note)(
+    // left side //////////////////
+    (QMK_ROW_HIGH_L_START <= note && note <= QMK_ROW_HIGH_L_END) ? (
+      retval = SINGLE_ROOT_NOTE + note - QMK_NOTE_SHIFT_NORMALIZE - 14;
+      /* tmp_note = note - QMK_NOTE_SHIFT_NORMALIZE; */
+    );
+    (QMK_ROW_MID_L_START <= note && note <= QMK_ROW_MID_L_END) ? (
+      retval = SINGLE_ROOT_NOTE + note - QMK_NOTE_SHIFT_NORMALIZE - 9;
+    );
+    (QMK_ROW_LOW_L_START <= note && note <= QMK_ROW_LOW_L_END) ? (
+      retval = SINGLE_ROOT_NOTE + note - QMK_NOTE_SHIFT_NORMALIZE - 4;
+    );
+    (QMK_ROW_BOTTOM_L_START <= note && note <= QMK_ROW_BOTTOM_L_END) ? (
+      retval = SINGLE_ROOT_NOTE + note - QMK_NOTE_SHIFT_NORMALIZE;
+    );
+    QMK_THUMB_INNER_L1 == note ? (
+      retval = SINGLE_ROOT_NOTE + note - QMK_NOTE_SHIFT_NORMALIZE;
+    );
+    // right side ////////////////
+    (QMK_ROW_HIGH_R_START <= note && note <= QMK_ROW_HIGH_R_END) ? (
+      retval = SINGLE_ROOT_NOTE + note - QMK_NOTE_SHIFT_NORMALIZE - 19;
+    );
+    (QMK_ROW_MID_R_START <= note && note <= QMK_ROW_MID_R_END) ? (
+      retval = SINGLE_ROOT_NOTE + note - QMK_NOTE_SHIFT_NORMALIZE - 14;
+    );
+    (QMK_ROW_LOW_R_START <= note && note <= QMK_ROW_LOW_R_END) ? (
+      retval = SINGLE_ROOT_NOTE + note - QMK_NOTE_SHIFT_NORMALIZE - 9;
+    );
+    (QMK_ROW_BOTTOM_R_START <= note && note <= QMK_ROW_BOTTOM_R_END) ? (
+      retval = SINGLE_ROOT_NOTE + note - QMK_NOTE_SHIFT_NORMALIZE - 4;
+    );
+    QMK_THUMB_INNER_R1 == note ? (
+      retval = SINGLE_ROOT_NOTE + note - QMK_NOTE_SHIFT_NORMALIZE - 4;
+    );
+
+  retval;
 );
 
 // QMK OUTPUT NOTE MAPPING
@@ -165,10 +228,9 @@ function qmk_computeNoteOut(mode, note)(
       retval = SINGLE_ROOT_NOTE + tmp_note;
     );
     mode == QMK_SPLIT ? (
-      // check left / right ???
-      retval = 24;
+      retval = qmk_mapSplitNotes(note);
     );
-    mode == GRAND_PIANO_FULL ? (
+    mode == GRAND_PIANO_FULL_MODE ? (
       tmp_note = note - GPAND_PIANO_NOTE_SHIFT_NORMALIZE;
       retval = 24;
     );
@@ -177,9 +239,12 @@ function qmk_computeNoteOut(mode, note)(
 
 
 @slider
-SINGLE_ROOT_NOTE = slider1;
-MIDI_DEVICE = slider2;
-MODE = slider3;
+/* SINGLE_ROOT_NOTE = slider1; */
+/* MIDI_DEVICE = slider2; */
+/* MODE = slider3; */
+
+MIDI_DEVICE = 0;
+MODE = 2;
 
 @block
 
@@ -209,7 +274,7 @@ while (
               midisend(offset,msg1,note+vel*256);
               ):(
                 WAS_FILTERED[note] = 1;
-                qmh_handleOtherKeys(note);
+                qmh_handleOtherKeys(MODE,note);
                 );
             ):
 
@@ -239,7 +304,7 @@ while (
                   midisend(offset,msg1,note+vel*256);
                   ):(
                     WAS_FILTERED[note] = 1;
-                    qmh_handleOtherKeys(note);
+                    qmh_handleOtherKeys(MODE,note);
                     );
                 ): // NOTE_ON
 
@@ -267,7 +332,7 @@ while (
                   midisend(offset,msg1,note+vel*256);
                   ):(
                     WAS_FILTERED[note] = 1;
-                    qmh_handleOtherKeys(note);
+                    qmh_handleOtherKeys(MODE,note);
                     );
                 ): // NOTE_ON
 
