@@ -13,21 +13,33 @@ import my_functions.jsfx-inc
 
    TODO ////////////////////////////////////
 
+    - refactor main loop into one branch per device.
+
+   - how can I set VEL / CH global ?
+        filterCheck >> only allow through notes
+          return false if velocity side
+        in the filtered area
+          set global_vel/global_ch
+          use these global variables for QMK
+
+      split up files by device > put all qmk vars in qmk_functions, grand etc..
+
     - split note / vel
       R = single note output
       L = left side outputs velocity
       >>> transpose should still work.
-
-    - config file list of midi devices > create custom command > set midi_device for sel tracks.
-        1. research > are there any good existing stuff
-        2. loop through list and check if exists...
 
     - split channel / notes
       L channel switching
       R = same note different vel
       >>> transpore should still work.
 
+
     - split ch/vel/mult note out put
+
+    - config file list of midi devices > create custom command > set midi_device for sel tracks.
+        1. research > are there any good existing stuff
+        2. loop through list and check if exists...
 
     - action > force only one rec armed track at once
 
@@ -55,9 +67,6 @@ import my_functions.jsfx-inc
    - article on indentation: http://psy.swansea.ac.uk/staff/carter/vim/vim_indent.htm
    - make plugin installable with all of the standard plugin managers
 
-   oooh!! it seems it would be possible to create sort of like a mini vim language for setting up the
-   midi instruments that I am using.
-
  */
 
 slider1:24<1,127,1>ROOT
@@ -69,7 +78,6 @@ out_pin:none
 
 @init
 
-// midi help...
 NOTE_OFF = 8;
 NOTE_ON = 9;
 
@@ -77,7 +85,7 @@ WAS_FILTERED = 1024;  // array for storing which notes are filtered
 
 PASS_THRU_CC = 0;
 
-
+GLOBAL_VEL = 80;
 
 @slider
 SINGLE_ROOT_NOTE = slider1;
@@ -102,12 +110,12 @@ while (
           statusHi == NOTE_ON && vel > 0 ? (
             filter = filter_check(MODE, note);
             (!filter) ? (
-              // create a function compute note
               note = qmk_computeNoteOut(MODE, note);
               midisend(offset,msg1,note+vel*256);
               ):(
                 WAS_FILTERED[note] = 1;
                 qmh_handleOtherKeys(MODE,note);
+
                 );
             ):
 
@@ -161,8 +169,11 @@ while (
                 filter = filter_check(MODE, note);
                 (!filter) ? (
                   note = qmk_computeNoteOut(MODE, note);
-                  /* vel = qmk_computeVelOut(MODE, note); */
-                  midisend(offset,msg1,note+vel*256);
+
+                  // this won_t work because I have to set the global vel and
+                  // not just here.
+                  /* GLOBAL_VEL = qmk_getVelOut(MODE, note); */
+                  midisend(offset,msg1,note+GLOBAL_VEL*256);
                   ):(
                     WAS_FILTERED[note] = 1;
                     qmh_handleOtherKeys(MODE,note);
@@ -216,7 +227,7 @@ while (
       );
               // GRAND_PIANO ////////////////////////////////////////////////////////////////////
 
-          MIDI_DEVICE == DEVICE_GRAND_PIANO ? (
+      MIDI_DEVICE == DEVICE_GRAND_PIANO ? (
               MODE == MODE_GRAND_PIANO_FULL ? (
                       // NOTE ONs ////////////////////////////////////////////////////////
                       statusHi == NOTE_ON && vel > 0 ? (

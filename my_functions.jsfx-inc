@@ -40,6 +40,7 @@ function qmh_handleOtherKeys(mode, input)(
       input == KC_QMK_TRANSPOSE_THUMBS_DOWN? transpose_down();
     );
     resetAllNotes();
+
 );
 
 function grand_handleOtherKeys(mode, input)(
@@ -128,8 +129,16 @@ function qmk_computeNoteOut(mode, note)(
     retval;
 );
 
-function qmk_computeVelOut(mode, note)(
-  return = mode;
+
+function qmk_getLeftHandVelFromNoteIn(note)(
+  retval;
+);
+
+function qmk_getVelOut(mode, note)(
+  mode == MODE_QMK_SPLIT_VEL_NOTE ? (
+    retval = qmk_getLeftHandVelFromNoteIn(note);
+  );
+  retval;
 );
 
 function grand_computeNoteOut(mode, note)(
