@@ -20,33 +20,15 @@ version: 1.0
 
    QMK ////////////////////////////////////
 
-   - single output               XXX
+    test w/piano
 
-   - full linear mode
-   - move reset keys to thumbs
-   - split note/vel >> hmmm??
-   - split notes
-   - single output
-   action > setup w currently active note in piano roll?
-   - quick changing
-   create a numpad. use note on / note off in order so select numpad selection layer.
-   this could then be used for super fast shifting of the board so that I can
-   by shift/transpose to a note that I want in 2 key strokes.
-   - MIDI EXAMINER > how are the sliders being updated?
-   it would probably be smart to use this same type of setting sliders HERE
-   >>> this allows me to easilly modify parameters w/VIMAC !!!!
+    split note / vel
 
-   CHANNEL ROUTING ////////////////////////////////////
+    split channel / notes
 
-   1. 16 channels / switch between 16 Group elements
-   2. qmk layers and logic to then decide the channel output of each Group to its children.
+    split kit > add ability to select output ranges for drumkit
 
 
-
-   IMPORT ////////////////////////////////////
-
-   - file > logic tree
-   - file > functions and variables.
 
    VIM ////////////////////////////////////
 
