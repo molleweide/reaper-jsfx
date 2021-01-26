@@ -13,7 +13,14 @@ import my_functions.jsfx-inc
 
    TODO ////////////////////////////////////
 
+   - start using 3 
+
+   - handle midi the same way with masks
+
    - am I writing velocity wrong???
+      - look at XQ_drum_converter.
+      - handle midi the same way with masks <<<<<<<<< !!!!!!!!!!!!!
+      - everything is there to be found.
 
     - merge qmk and grand into one statement
 
@@ -49,6 +56,15 @@ import my_functions.jsfx-inc
         3. input 2 digit change key.
         4. add key for resetting the current sequence
 
+    - walk through reateam fx and clone everything over to my repo
+      think about how everything can be divided up into modules
+        how can I make this into my personal super library for
+          managing midi.
+            how can this become a growing process so that I can develop from time to time
+              and focus on producing
+                how can this become a growing process so that I can develop from time to time
+                  and focus on producing.
+
   MIDI VIM
 
     - how do I differentiate messages between multiple rec armed instances?
@@ -60,6 +76,7 @@ import my_functions.jsfx-inc
 
    VIM ////////////////////////////////////
 
+    - learn vimscript
    - make eel syntax into plugin >> publish to github
    - vim indent anything plugin?
    - article on indentation: http://psy.swansea.ac.uk/staff/carter/vim/vim_indent.htm
@@ -81,30 +98,31 @@ MODE = slider3;
 
 @block
 while (
-    input = midirecv(offset,msg1,msg23);
+    //input = midirecv(offset,msg1,msg23);
+    input = midirecv(offset,msg1,msg2,msg3);
     input ? (
 
-      statusHi = (msg1/16)|0;
-      statusLo = (msg1-(statusHi*16))|0;
-      input_note = msg23&127;
-      vel =(msg23/256)|0;
+      midi_in_type = msg1&TYPE_MASK; // TYPE
+      midi_in_channel = msg1&CHANNEL_MASK; // channel
+      midi_in_note = msg2;
+      midi_in_vel = msg3;
 
       // QMK ////////////////////////////////////////////////////////////////////
       MIDI_DEVICE == DEVICE_QMK ? (
-          statusHi == NOTE_ON && vel > 0 ? (
-            note_inside = filter_check(MODE, input_note);
+          midi_in_type == NOTE_ON && midi_in_vel > 0 ? (
+            note_inside = filter_check(MODE, midi_in_note);
             (note_inside > 0) ? ( // inside
               midisend(offset,msg1,note_inside+GLOBAL_VEL*256); // set channel
             ):( // outside
-              WAS_FILTERED[input_note] = 1;
-              qmk_handleOtherKeys(MODE,input_note); // set global_vel / global_ch here
+              WAS_FILTERED[midi_in_note] = 1;
+              qmk_handleOtherKeys(MODE,midi_in_note); // set global_vel / global_ch here
             );
           ):
-          statusHi == NOTE_OFF || (statusHi == NOTE_ON && vel == 0 ) ? (
-            WAS_FILTERED[input_note] ? (
-              WAS_FILTERED[input_note] = 0;
+          midi_in_type == NOTE_OFF || (midi_in_type == NOTE_ON && midi_in_vel == 0 ) ? (
+            WAS_FILTERED[midi_in_note] ? (
+              WAS_FILTERED[midi_in_note] = 0;
               ):(
-                note_off_inside = filter_check(MODE, input_note);
+                note_off_inside = filter_check(MODE, midi_in_note);
                 midisend(offset,msg1,note_off_inside+GLOBAL_VEL*256);
                 );
             );
@@ -117,25 +135,25 @@ while (
 
       MIDI_DEVICE == DEVICE_GRAND_PIANO ? (
               // NOTE ONs ////////////////////////////////////////////////////////
-              statusHi == NOTE_ON && vel > 0 ? (
-                filter = filter_check(MODE, input_note);
+              midi_in_type == NOTE_ON && midi_in_vel > 0 ? (
+                filter = filter_check(MODE, midi_in_note);
                 (!filter) ? (
-                  input_note = grand_computeNoteOut(MODE, input_note);
-                  midisend(offset,msg1,input_note+vel*256);
+                  midi_in_note = grand_computeNoteOut(MODE, midi_in_note);
+                  midisend(offset,msg1,midi_in_note+midi_in_vel*256);
                   ):(
-                    WAS_FILTERED[input_note] = 1;
-                    grand_handleOtherKeys(MODE,input_note);
+                    WAS_FILTERED[midi_in_note] = 1;
+                    grand_handleOtherKeys(MODE,midi_in_note);
                     );
                 ): // NOTE_ON
 
-              // input_note OFFs /////////////////////////////////////////////////////
-              statusHi == NOTE_OFF || (statusHi == NOTE_ON && vel == 0 ) ? (
+              // midi_in_note OFFs /////////////////////////////////////////////////////
+              midi_in_type == NOTE_OFF || (midi_in_type == NOTE_ON && midi_in_vel == 0 ) ? (
 
-                WAS_FILTERED[input_note] ? (
-                  WAS_FILTERED[input_note] = 0;
+                WAS_FILTERED[midi_in_note] ? (
+                  WAS_FILTERED[midi_in_note] = 0;
                   ):(
-                    input_note = grand_computeNoteOut(MODE, input_note);
-                    midisend(offset,msg1,input_note+vel*256);
+                    midi_in_note = grand_computeNoteOut(MODE, midi_in_note);
+                    midisend(offset,msg1,midi_in_note+midi_in_vel*256);
                     );
                 ); // NOTE_OFF
 
