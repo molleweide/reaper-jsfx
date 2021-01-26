@@ -1,0 +1,49 @@
+@init
+
+function device_has_vel(device)
+  local(r)
+(
+  r=0;
+  device == DEVICE_QMK ? r = 0 ? r = 1;
+  r;
+);
+
+// if inside return int greater than 0 else return 0
+function filter_check(mode, note) (
+  retval = 0;
+    mode == MODE_QMK_SINGLE_BASIC ? ( ////////////////////////
+      qmk_inside_reduced(note) ? retval = SINGLE_ROOT_NOTE;
+    );
+    mode == MODE_QMK_FULL_LINEAR ? ( ////////////////////////
+      qmk_inside_full(note) ? (
+        retval = SINGLE_ROOT_NOTE + note - QMK_NOTE_SHIFT_NORMALIZE;
+      );
+    );
+    mode == MODE_QMK_SPLIT_VEL_NOTE ? ( ///////////////////////
+      R = qmk_insideRightSide(note);
+      R > -1 ? (
+        retval = SINGLE_ROOT_NOTE + R;
+      ); // else we return 0 and note will be filtered out
+    );
+    mode == MODE_QMK_SPLIT_MULT_CH ? ( /////////////////////////
+      R = qmk_insideRightSide(note);
+      R > -1 ? (
+        retval = SINGLE_ROOT_NOTE + R;
+      ); // else we return 0 and note will be filtered out
+    );
+
+    mode == MODE_GRAND_PIANO_FULL ? (
+      (note >= GRAND_PIANO_LOW && note <= GRAND_PIANO_HIGH)
+      ? (
+       retval = SINGLE_ROOT_NOTE + note - GPAND_PIANO_NOTE_SHIFT_NORMALIZE;
+      );
+    );
+    retval;
+);
+
+
+// call respective device control functions from here
+function handleControlKeys(device, mode, input)(
+    device == DEVICE_QMK ? qmk_handle_control_keys(mode, input);
+    device == DEVICE_GRAND_PIANO ? piano_handle_control_keys(mode, input);
+);

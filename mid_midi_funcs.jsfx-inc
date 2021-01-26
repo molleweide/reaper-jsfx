@@ -1,0 +1,26 @@
+@init
+
+function resetAllNotes()
+(
+  // loop through all notes
+  loop(127,
+    i += 1;
+    vel = 80;
+    midisend(0,$x80,i+vel*256);
+  );
+);
+
+// check limits:  t < 0 ? t = 0 : t > 127 ? t = 127;
+function transpose_up()(
+    SINGLE_ROOT_NOTE < 127 ? (
+      SINGLE_ROOT_NOTE += 1;
+      );
+  resetAllNotes();
+);
+
+function transpose_down()(
+    SINGLE_ROOT_NOTE > 0 ? (
+      SINGLE_ROOT_NOTE -= 1;
+      );
+  resetAllNotes();
+);

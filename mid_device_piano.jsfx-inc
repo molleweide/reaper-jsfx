@@ -1,0 +1,16 @@
+@init
+
+function piano_handle_control_keys(mode, input)
+(
+
+  mode == MODE_GRAND_PIANO_FULL ? (
+      input == KC_GRAND_TRANSPOSE_RESET ? SINGLE_ROOT_NOTE = 24;
+      input == KC_GRAND_RESET_ALL_NOTES ? resetAllNotes();
+      input == KC_GRAND_TRANSPOSE_UP ? transpose_up();
+      input == KC_GRAND_TRANSPOSE_DOWN ? transpose_down();
+  );
+
+      resetAllNotes(); // mv to if press KC_QMK_RESET_ALL_MIDI
+
+);
+

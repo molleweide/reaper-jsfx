@@ -1,10 +1,11 @@
-desc: molleweide old devices
+desc: molleweide custom midi device preprocessor
 author: molleweide
 version: 1.0
 
 import mid_vars.jsfx-inc
-import midi_device_qmk.jsfx-inc
-import midi_device_piano.jsfx-inc
+import mid_midi_funcs.jsfx-inc
+import mid_device_qmk.jsfx-inc
+import mid_device_piano.jsfx-inc
 import mid_funcs.jsfx-inc
 
 /*
@@ -15,28 +16,26 @@ import mid_funcs.jsfx-inc
 
    TODO ////////////////////////////////////
 
-    - reset global vel when select qmk single?
+    - I need to record more parts and do some mixing.
 
-    - split channel / notes
-      L channel switching
-      R = same note different vel
-      >>> transpore should still work.
+    - qmk switch mode with outer kes above transpose keys
 
-    - split ch/vel/mult note out put
+    - add qmk_kit_mode >> so that I can begin to do kit programming.
 
-    - config file list of midi devices > create custom command > set midi_device for sel tracks.
-        1. research > are there any good existing stuff
-        2. loop through list and check if exists...
+    - add note numbers to piano roll.
 
-    - action > force only one rec armed track at once
-
-    - split kit > add ability to select output ranges for drumkit
 
     - hold down `UPDATE REGION`
         1. setState()=REGION_CHANGE_MODE
         2. press region that requires change
         3. input 2 digit change key.
         4. add key for resetting the current sequence
+
+    - action > force only one rec armed track at once
+
+    - config file list of midi devices > create custom command > set midi_device for sel tracks.
+        1. research > are there any good existing stuff
+        2. loop through list and check if exists...
 
     - walk through reateam fx and clone everything over to my repo
       think about how everything can be divided up into modules
@@ -95,7 +94,12 @@ while (
       (midi_out_note_on > 0) ? (
 
         device_has_vel(MIDI_DEVICE) ? midi_out_vel = midi_in_vel : midi_out_vel = GLOBAL_VEL;
-        midisend(offset,midi_in_type+midi_in_channel,midi_out_note_on,midi_out_vel);
+
+        // will this cause problems if I switch ch mid note down?
+        // keep track of it first is note off then use prev ch??? hmmm??
+        midi_out_ch = GLOBAL_CH;
+
+        midisend(offset,midi_in_type+midi_out_ch,midi_out_note_on,midi_out_vel);
 
       ):(
 
@@ -115,7 +119,11 @@ while (
       ):(
 
           midi_out_note_off = filter_check(MODE, midi_in_note);
+
           device_has_vel(MIDI_DEVICE) ? midi_out_vel = midi_in_vel : midi_out_vel = GLOBAL_VEL;
+
+          midi_out_ch = GLOBAL_CH;
+
           midisend(offset,midi_in_type+midi_in_channel,midi_out_note_off,midi_out_vel);
 
       );
