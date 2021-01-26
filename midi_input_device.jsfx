@@ -13,32 +13,14 @@ import my_functions.jsfx-inc
 
    TODO ////////////////////////////////////
 
-   - start using 3 
-
-   - handle midi the same way with masks
-
-   - am I writing velocity wrong???
-      - look at XQ_drum_converter.
-      - handle midi the same way with masks <<<<<<<<< !!!!!!!!!!!!!
-      - everything is there to be found.
-
     - merge qmk and grand into one statement
 
-    - inside L/R hand AND handleOtherKeys
-        chain if/else so that I don't do checks for all if one is true
-
-      - split up files by device > put all qmk vars in qmk_functions, grand etc..
-
-    - split note / vel
-      R = single note output
-      L = left side outputs velocity
-      >>> transpose should still work.
+    - reset global vel when select qmk single?
 
     - split channel / notes
       L channel switching
       R = same note different vel
       >>> transpore should still work.
-
 
     - split ch/vel/mult note out put
 
@@ -112,7 +94,8 @@ while (
           midi_in_type == NOTE_ON && midi_in_vel > 0 ? (
             note_inside = filter_check(MODE, midi_in_note);
             (note_inside > 0) ? ( // inside
-              midisend(offset,msg1,note_inside+GLOBAL_VEL*256); // set channel
+              //midisend(offset,msg1,note_inside+GLOBAL_VEL*256); // set channel
+              midisend(offset,midi_in_type+midi_in_channel,note_inside,GLOBAL_VEL);
             ):( // outside
               WAS_FILTERED[midi_in_note] = 1;
               qmk_handleOtherKeys(MODE,midi_in_note); // set global_vel / global_ch here
@@ -123,7 +106,8 @@ while (
               WAS_FILTERED[midi_in_note] = 0;
               ):(
                 note_off_inside = filter_check(MODE, midi_in_note);
-                midisend(offset,msg1,note_off_inside+GLOBAL_VEL*256);
+                //midisend(offset,msg1,note_off_inside+GLOBAL_VEL*256);
+                midisend(offset,midi_in_type+midi_in_channel,note_off_inside,GLOBAL_VEL);
                 );
             );
 
@@ -139,7 +123,8 @@ while (
                 filter = filter_check(MODE, midi_in_note);
                 (!filter) ? (
                   midi_in_note = grand_computeNoteOut(MODE, midi_in_note);
-                  midisend(offset,msg1,midi_in_note+midi_in_vel*256);
+                  midisend(offset,midi_in_type+midi_in_channel,note_inside,midi_in_vel);
+                  //midisend(offset,msg1,midi_in_note+midi_in_vel*256);
                   ):(
                     WAS_FILTERED[midi_in_note] = 1;
                     grand_handleOtherKeys(MODE,midi_in_note);
@@ -152,8 +137,8 @@ while (
                 WAS_FILTERED[midi_in_note] ? (
                   WAS_FILTERED[midi_in_note] = 0;
                   ):(
-                    midi_in_note = grand_computeNoteOut(MODE, midi_in_note);
-                    midisend(offset,msg1,midi_in_note+midi_in_vel*256);
+                    note_off_inside = grand_computeNoteOut(MODE, midi_in_note);
+                    midisend(offset,msg1,note_off_inside+midi_in_vel*256);
                     );
                 ); // NOTE_OFF
 
