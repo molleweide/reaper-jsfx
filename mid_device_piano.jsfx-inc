@@ -1,5 +1,15 @@
 @init
 
+      
+
+function grand_piano_inside_full(note)
+  local(r)
+(
+  r = 0;
+ (note >= GRAND_PIANO_LOW && note <= GRAND_PIANO_HIGH) ? r = 1;
+  r;
+);
+
 function piano_handle_control_keys(mode, input)
 (
 

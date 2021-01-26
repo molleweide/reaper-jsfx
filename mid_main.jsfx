@@ -13,15 +13,15 @@ import mid_main_funcs.jsfx-inc
 /*
    LINKS
 
-   - MIDI SPEC: http://www.petesqbsite.com/sections/express/issue18/midifilespart1.html
-   - MIDI TUTORIAL BIG: https://www.admiralbumblebee.com/music/2018/02/08/Write-a-Reaper-MIDI-JSFX-from-scratch.html#for-programmers
+     - MIDI SPEC: http://www.petesqbsite.com/sections/express/issue18/midifilespart1.html
 
-   TODO ////////////////////////////////////
-
-    - I need to record more parts and do some mixing.
+   TODOS
 
     - qmk switch mode with outer kes above transpose keys
       only change for device...
+
+    - mult channel
+        I have to force release note with previous ch some so that notes don't get stuck
 
     - add qmk_kit_mode >> so that I can begin to do kit programming.
 
@@ -34,14 +34,6 @@ import mid_main_funcs.jsfx-inc
     - config file list of midi devices > create custom command > set midi_device for sel tracks.
         1. research > are there any good existing stuff
         2. loop through list and check if exists...
-
-   VIM ////////////////////////////////////
-
-    - learn vimscript
-   - make eel syntax into plugin >> publish to github
-   - vim indent anything plugin?
-   - article on indentation: http://psy.swansea.ac.uk/staff/carter/vim/vim_indent.htm
-   - make plugin installable with all of the standard plugin managers
 
  */
 
@@ -69,7 +61,7 @@ while (
     // note on ////////////////////////////////////////////
     midi_in_type == NOTE_ON && midi_in_vel > 0 ? (
 
-      midi_out_note_on = filter_check(MODE, midi_in_note);
+      midi_out_note_on = getOutputNoteNumber(MODE, midi_in_note);
 
       (midi_out_note_on > 0) ? (
 
@@ -98,7 +90,7 @@ while (
 
       ):(
 
-          midi_out_note_off = filter_check(MODE, midi_in_note);
+          midi_out_note_off = getOutputNoteNumber(MODE, midi_in_note);
 
           device_has_vel(MIDI_DEVICE) ? midi_out_vel = midi_in_vel : midi_out_vel = GLOBAL_VEL;
 
