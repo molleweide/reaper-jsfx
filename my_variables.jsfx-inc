@@ -1,21 +1,28 @@
 @init
 
+// MIDI HELPER VARIABLE
+NOTE_OFF = 8;
+NOTE_ON = 9;
+WAS_FILTERED = 1024;  // array for storing which notes are filtered
+PASS_THRU_CC = 0;
+
 // GLOBAL OPTIONS
 SINGLE_ROOT_NOTE = 24; // reset transpose by setting this to 24
+GLOBAL_VEL = 80; // for usage w/QMK that don't send variable velocity
+GLOBAL_CH = 1; // how do I set channel 1?
 
-// device..............
-// MIDI_DEVICE = 0;
+// DEVICE..............
 DEVICE_QMK = 0;
 DEVICE_GRAND_PIANO = 1;
 
-// modes..........
+// MODES..........
 MODE_QMK_SINGLE_BASIC = 0;
 MODE_QMK_FULL_LINEAR = 1;
 MODE_QMK_SPLIT_VEL_NOTE = 2;
 MODE_GRAND_PIANO_FULL = 3;
 MODE_QMK_SPLIT_MULT_CH = 4;
 
-// qmk variables
+// QMK VARIABLES
 QMK_NOTE_SHIFT_NORMALIZE = 48; // i have to look this up
 QMK_FULL_HIGH = 85;
 QMK_FULL_LOW = 48;

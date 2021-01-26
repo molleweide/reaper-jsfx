@@ -13,13 +13,9 @@ import my_functions.jsfx-inc
 
    TODO ////////////////////////////////////
 
-   - retrieve note back into filter >> reduce computations by 50%
+   - am I writing velocity wrong???
 
-   - MODE_QMK_SPLIT_VEL_NOTE
-        make sure I only get note output for right side with
-
-    - qmh_handleOtherKeys
-          set GLOBAL_VEL / GLOBAL_CH
+    - merge qmk and grand into one statement
 
     - inside L/R hand AND handleOtherKeys
         chain if/else so that I don't do checks for all if one is true
@@ -78,18 +74,6 @@ slider3:0<0,2,1{QMK_SINGLE,QMK_FULL,QMK_SPLIT,GRAND_FULL,QMK_SPLIT_CH}>MODE
 out_pin:none
 out_pin:none
 
-@init
-
-NOTE_OFF = 8;
-NOTE_ON = 9;
-
-WAS_FILTERED = 1024;  // array for storing which notes are filtered
-
-PASS_THRU_CC = 0;
-
-GLOBAL_VEL = 80; // for usage w/QMK that don't send variable velocity
-GLOBAL_CH = 1; // how do I set channel 1?
-
 @slider
 SINGLE_ROOT_NOTE = slider1;
 MIDI_DEVICE = slider2;
@@ -113,7 +97,7 @@ while (
               midisend(offset,msg1,note_inside+GLOBAL_VEL*256); // set channel
             ):( // outside
               WAS_FILTERED[input_note] = 1;
-              qmh_handleOtherKeys(MODE,input_note); // set global_vel / global_ch here
+              qmk_handleOtherKeys(MODE,input_note); // set global_vel / global_ch here
             );
           ):
           statusHi == NOTE_OFF || (statusHi == NOTE_ON && vel == 0 ) ? (
