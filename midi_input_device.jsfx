@@ -13,7 +13,9 @@ import my_functions.jsfx-inc
 
    TODO ////////////////////////////////////
 
-    - merge qmk and grand into one statement
+    - merge qmk_ and grand_ functions
+        1. I have to pass device to handle other keys
+        2. 
 
     - reset global vel when select qmk single?
 
@@ -80,72 +82,51 @@ MODE = slider3;
 
 @block
 while (
-    //input = midirecv(offset,msg1,msg23);
-    input = midirecv(offset,msg1,msg2,msg3);
-    input ? (
+  input = midirecv(offset,msg1,msg2,msg3);
+  input ? (
+    midi_in_type = msg1&TYPE_MASK;
+    midi_in_channel = msg1&CHANNEL_MASK;
+    midi_in_note = msg2;
+    midi_in_vel = msg3;
 
-      midi_in_type = msg1&TYPE_MASK; // TYPE
-      midi_in_channel = msg1&CHANNEL_MASK; // channel
-      midi_in_note = msg2;
-      midi_in_vel = msg3;
+    // note on ////////////////////////////////////////////
+    midi_in_type == NOTE_ON && midi_in_vel > 0 ? (
 
-      // QMK ////////////////////////////////////////////////////////////////////
-      MIDI_DEVICE == DEVICE_QMK ? (
-          midi_in_type == NOTE_ON && midi_in_vel > 0 ? (
-            note_inside = filter_check(MODE, midi_in_note);
-            (note_inside > 0) ? ( // inside
-              //midisend(offset,msg1,note_inside+GLOBAL_VEL*256); // set channel
-              midisend(offset,midi_in_type+midi_in_channel,note_inside,GLOBAL_VEL);
-            ):( // outside
-              WAS_FILTERED[midi_in_note] = 1;
-              qmk_handleOtherKeys(MODE,midi_in_note); // set global_vel / global_ch here
-            );
-          ):
-          midi_in_type == NOTE_OFF || (midi_in_type == NOTE_ON && midi_in_vel == 0 ) ? (
-            WAS_FILTERED[midi_in_note] ? (
-              WAS_FILTERED[midi_in_note] = 0;
-              ):(
-                note_off_inside = filter_check(MODE, midi_in_note);
-                //midisend(offset,msg1,note_off_inside+GLOBAL_VEL*256);
-                midisend(offset,midi_in_type+midi_in_channel,note_off_inside,GLOBAL_VEL);
-                );
-            );
+      midi_out_note_on = filter_check(MODE, midi_in_note);
 
-          PASS_THRU_CC ? (
-              midisend(mpos, msg1, msg23);
-              );
+      (midi_out_note_on > 0) ? (
+
+        device_has_vel(MIDI_DEVICE) ? midi_out_vel = midi_in_vel : midi_out_vel = GLOBAL_VEL;
+        midisend(offset,midi_in_type+midi_in_channel,midi_out_note_on,midi_out_vel);
+
+      ):(
+
+        WAS_FILTERED[midi_in_note] = 1;
+        qmk_handleOtherKeys(MIDI_DEVICE, MODE,midi_in_note);
+
       );
-              // GRAND_PIANO ////////////////////////////////////////////////////////////////////
+    ): // else if
 
-      MIDI_DEVICE == DEVICE_GRAND_PIANO ? (
-              // NOTE ONs ////////////////////////////////////////////////////////
-              midi_in_type == NOTE_ON && midi_in_vel > 0 ? (
-                filter = filter_check(MODE, midi_in_note);
-                (!filter) ? (
-                  midi_in_note = grand_computeNoteOut(MODE, midi_in_note);
-                  midisend(offset,midi_in_type+midi_in_channel,note_inside,midi_in_vel);
-                  //midisend(offset,msg1,midi_in_note+midi_in_vel*256);
-                  ):(
-                    WAS_FILTERED[midi_in_note] = 1;
-                    grand_handleOtherKeys(MODE,midi_in_note);
-                    );
-                ): // NOTE_ON
+    // NOTE OFF ////////////////////////////////////////////
+    midi_in_type == NOTE_OFF || (midi_in_type == NOTE_ON && midi_in_vel == 0 ) ? (
 
-              // midi_in_note OFFs /////////////////////////////////////////////////////
-              midi_in_type == NOTE_OFF || (midi_in_type == NOTE_ON && midi_in_vel == 0 ) ? (
+      WAS_FILTERED[midi_in_note] ? (
 
-                WAS_FILTERED[midi_in_note] ? (
-                  WAS_FILTERED[midi_in_note] = 0;
-                  ):(
-                    note_off_inside = grand_computeNoteOut(MODE, midi_in_note);
-                    midisend(offset,msg1,note_off_inside+midi_in_vel*256);
-                    );
-                ); // NOTE_OFF
+        WAS_FILTERED[midi_in_note] = 0;
 
-              PASS_THRU_CC ? (
-                  midisend(mpos, msg1, msg23);
-              ); // PASS_THRU_CC
-        ); // DEVICE_GRAND_PIANO
-      ); // input ? ()
-    input;
+      ):(
+
+          midi_out_note_off = filter_check(MODE, midi_in_note);
+          device_has_vel(MIDI_DEVICE) ? midi_out_vel = midi_in_vel : midi_out_vel = GLOBAL_VEL;
+          midisend(offset,midi_in_type+midi_in_channel,midi_out_note_off,midi_out_vel);
+
+      );
+    ): // else if
+
+    // MIDI CC ////////////////////////////////////////////
+    PASS_THRU_CC ? (
+        midisend(mpos, msg1, msg2, msg3);
+    );
+  ); // input
+  input;
 );
