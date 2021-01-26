@@ -3,10 +3,12 @@ author: molleweide
 version: 1.0
 
 import mid_vars.jsfx-inc
-import mid_midi_funcs.jsfx-inc
+import mid_midi.jsfx-inc
+
 import mid_device_qmk.jsfx-inc
 import mid_device_piano.jsfx-inc
-import mid_funcs.jsfx-inc
+
+import mid_main_funcs.jsfx-inc
 
 /*
    LINKS
@@ -19,41 +21,19 @@ import mid_funcs.jsfx-inc
     - I need to record more parts and do some mixing.
 
     - qmk switch mode with outer kes above transpose keys
+      only change for device...
 
     - add qmk_kit_mode >> so that I can begin to do kit programming.
 
     - add note numbers to piano roll.
 
-
-    - hold down `UPDATE REGION`
-        1. setState()=REGION_CHANGE_MODE
-        2. press region that requires change
-        3. input 2 digit change key.
-        4. add key for resetting the current sequence
+    - vim > play/config
 
     - action > force only one rec armed track at once
 
     - config file list of midi devices > create custom command > set midi_device for sel tracks.
         1. research > are there any good existing stuff
         2. loop through list and check if exists...
-
-    - walk through reateam fx and clone everything over to my repo
-      think about how everything can be divided up into modules
-        how can I make this into my personal super library for
-          managing midi.
-            how can this become a growing process so that I can develop from time to time
-              and focus on producing
-                how can this become a growing process so that I can develop from time to time
-                  and focus on producing.
-
-  MIDI VIM
-
-    - how do I differentiate messages between multiple rec armed instances?
-    - what is the fastest way for changing and setting up multiple regions (ranges)
-      >>> proposal
-        1. enter switch mode
-        2. press the region I want to setup.
-        3. input start note for region.
 
    VIM ////////////////////////////////////
 

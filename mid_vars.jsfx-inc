@@ -49,11 +49,17 @@ SINGLE_ROOT_NOTE = 24; // reset transpose by setting this to 24
 GLOBAL_VEL = 80; // for usage w/QMK that don't send variable velocity
 GLOBAL_CH = 1; // how do I set channel 1?
 
-// DEVICE..............
+// VIM
+
+/* VIM_MODE_PLAY = 1; */
+/* VIM_MODE_CONFIG = 2; */
+/* VIM_MODE = VIM_MODE_PLAY; */
+
+// DEVICES ..............
 DEVICE_QMK = 0;
 DEVICE_GRAND_PIANO = 1;
 
-// MODES..........
+// DEVICE MODES..........
 MODE_QMK_SINGLE_BASIC = 0;
 MODE_QMK_FULL_LINEAR = 1;
 MODE_QMK_SPLIT_VEL_NOTE = 2;
