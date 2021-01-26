@@ -173,14 +173,14 @@ function filter_check(mode, note) (
       );
     );
     mode == MODE_QMK_SPLIT_VEL_NOTE ? ( ///////////////////////
-      L = qmk_insideRightSide(note);
-      L < 0 ? (
-        retval = SINGLE_ROOT_NOTE + L;
+      R = qmk_insideRightSide(note);
+      R > -1 ? (
+        retval = SINGLE_ROOT_NOTE + R;
       ); // else we return 0 and note will be filtered out
     );
     mode == MODE_QMK_SPLIT_MULT_CH ? ( /////////////////////////
       R = qmk_insideRightSide(note);
-      R < 0 ? (
+      R > -1 ? (
         retval = SINGLE_ROOT_NOTE + R;
       ); // else we return 0 and note will be filtered out
     );
