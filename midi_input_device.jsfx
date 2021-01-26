@@ -1,3 +1,4 @@
+
 desc: molleweide custom midi device preprocessor
 author: molleweide
 version: 1.0
@@ -102,36 +103,26 @@ while (
 
       statusHi = (msg1/16)|0;
       statusLo = (msg1-(statusHi*16))|0;
-      note = msg23&127;
+      input_note = msg23&127;
       vel =(msg23/256)|0;
 
       // QMK ////////////////////////////////////////////////////////////////////
       MIDI_DEVICE == DEVICE_QMK ? (
-           // NOTE ONs ////////////////////////////////////////////////////////
           statusHi == NOTE_ON && vel > 0 ? (
-
-            // I could return the note value back into `filter`
-            // >>> reduce computations by /2
-            //
-            //  note > 0 ? ()
-
-
-            filter = filter_check(MODE, note);
-            (!filter) ? (
-              note = qmk_computeNoteOut(MODE, note);
-              midisend(offset,msg1,note+vel*256); // GLOBAL_CH / GLOBAL_VEL
-              ):(
-                WAS_FILTERED[note] = 1;
-                qmh_handleOtherKeys(MODE,note); // set global_vel / global_ch here
-                );
-            ):
-          // NOTE OFFs /////////////////////////////////////////////////////
+            note_inside = filter_check(MODE, input_note);
+            (note_inside > 0) ? ( // inside
+              midisend(offset,msg1,note_inside+GLOBAL_VEL*256); // set channel
+            ):( // outside
+              WAS_FILTERED[input_note] = 1;
+              qmh_handleOtherKeys(MODE,input_note); // set global_vel / global_ch here
+            );
+          ):
           statusHi == NOTE_OFF || (statusHi == NOTE_ON && vel == 0 ) ? (
-            WAS_FILTERED[note] ? (
-              WAS_FILTERED[note] = 0;
+            WAS_FILTERED[input_note] ? (
+              WAS_FILTERED[input_note] = 0;
               ):(
-                note = qmk_computeNoteOut(MODE, note);
-                midisend(offset,msg1,note+vel*256);
+                note_off_inside = filter_check(MODE, input_note);
+                midisend(offset,msg1,note_off_inside+GLOBAL_VEL*256);
                 );
             );
 
@@ -144,24 +135,24 @@ while (
       MIDI_DEVICE == DEVICE_GRAND_PIANO ? (
               // NOTE ONs ////////////////////////////////////////////////////////
               statusHi == NOTE_ON && vel > 0 ? (
-                filter = filter_check(MODE, note);
+                filter = filter_check(MODE, input_note);
                 (!filter) ? (
-                  note = grand_computeNoteOut(MODE, note);
-                  midisend(offset,msg1,note+vel*256);
+                  input_note = grand_computeNoteOut(MODE, input_note);
+                  midisend(offset,msg1,input_note+vel*256);
                   ):(
-                    WAS_FILTERED[note] = 1;
-                    grand_handleOtherKeys(MODE,note);
+                    WAS_FILTERED[input_note] = 1;
+                    grand_handleOtherKeys(MODE,input_note);
                     );
                 ): // NOTE_ON
 
-              // NOTE OFFs /////////////////////////////////////////////////////
+              // input_note OFFs /////////////////////////////////////////////////////
               statusHi == NOTE_OFF || (statusHi == NOTE_ON && vel == 0 ) ? (
 
-                WAS_FILTERED[note] ? (
-                  WAS_FILTERED[note] = 0;
+                WAS_FILTERED[input_note] ? (
+                  WAS_FILTERED[input_note] = 0;
                   ):(
-                    note = grand_computeNoteOut(MODE, note);
-                    midisend(offset,msg1,note+vel*256);
+                    input_note = grand_computeNoteOut(MODE, input_note);
+                    midisend(offset,msg1,input_note+vel*256);
                     );
                 ); // NOTE_OFF
 

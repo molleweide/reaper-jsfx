@@ -61,23 +61,11 @@ function grand_handleOtherKeys(mode, input)(
   );
   resetAllNotes();
 );
-// RENAME TO NOTE ON / OFF INPUT GATE ??
-function filter_check(mode, note) (
-    mode == MODE_QMK_SINGLE_BASIC ? (
-      retval = (note < QMK_SINGLE_LOW || note > QMK_SINGLE_HIGH)
-      && note != QMK_THUMB_INNER_L1 && note != QMK_THUMB_INNER_R1;
-    );
-    (mode == MODE_QMK_FULL_LINEAR || mode == MODE_QMK_SPLIT_VEL_NOTE || mode == MODE_QMK_SPLIT_MULT_CH) ? (
-      retval = note < QMK_FULL_LOW || note > QMK_FULL_HIGH;
-    );
-    mode == MODE_GRAND_PIANO_FULL ? (
-      retval = note < GRAND_PIANO_LOW || note > GRAND_PIANO_HIGH;
-    );
-    retval;
-);
+
+
 
 function qmk_insideLeftSide(note)(
-  retval = 0;
+  retval = -1;
     (QMK_ROW_HIGH_L_START <= note && note <= QMK_ROW_HIGH_L_END) ? (
       retval = note - QMK_NOTE_SHIFT_NORMALIZE - 14;
       /* tmp_note = note - QMK_NOTE_SHIFT_NORMALIZE; */
@@ -98,7 +86,7 @@ function qmk_insideLeftSide(note)(
 );
 
 function qmk_insideRightSide(note)(
-  retval = 0;
+  retval = -1;
     (QMK_ROW_HIGH_R_START <= note && note <= QMK_ROW_HIGH_R_END) ? (
       retval = note - QMK_NOTE_SHIFT_NORMALIZE - 19;
     );
@@ -168,6 +156,42 @@ function qmk_mapSplitNotesSingle(note)(
     );
 
   retval;
+);
+
+function filter_check(mode, note) (
+  // if inside return int greater than 0 else return 0
+  retval = 0;
+    mode == MODE_QMK_SINGLE_BASIC ? ( ////////////////////////
+      ((note >= QMK_SINGLE_LOW && note <= QMK_SINGLE_HIGH)
+          || note == QMK_THUMB_INNER_L1 || note == QMK_THUMB_INNER_R1)
+        ? retval = SINGLE_ROOT_NOTE;
+    );
+    mode == MODE_QMK_FULL_LINEAR ? ( ////////////////////////
+      (note >= QMK_FULL_LOW && note <= QMK_FULL_HIGH)
+        ? (
+        retval = SINGLE_ROOT_NOTE + note - QMK_NOTE_SHIFT_NORMALIZE;
+      );
+    );
+    mode == MODE_QMK_SPLIT_VEL_NOTE ? ( ///////////////////////
+      L = qmk_insideRightSide(note);
+      L < 0 ? (
+        retval = SINGLE_ROOT_NOTE + L;
+      ); // else we return 0 and note will be filtered out
+    );
+    mode == MODE_QMK_SPLIT_MULT_CH ? ( /////////////////////////
+      R = qmk_insideRightSide(note);
+      R < 0 ? (
+        retval = SINGLE_ROOT_NOTE + R;
+      ); // else we return 0 and note will be filtered out
+    );
+
+    mode == MODE_GRAND_PIANO_FULL ? (
+      (note >= GRAND_PIANO_LOW && note <= GRAND_PIANO_HIGH)
+      ? (
+       retval = SINGLE_ROOT_NOTE + note - GPAND_PIANO_NOTE_SHIFT_NORMALIZE;
+      );
+    );
+    retval;
 );
 
 // QMK OUTPUT NOTE MAPPING
