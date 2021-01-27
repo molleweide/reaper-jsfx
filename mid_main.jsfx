@@ -75,7 +75,7 @@ while (
     midi_in_note = msg2;
     midi_in_vel = msg3;
 
-    // note on ////////////////////////////////////////////
+    // note on /////////////////////////////////////////////
     midi_in_type == NOTE_ON && midi_in_vel > 0 ? (
 
       midi_out_note_on = getOutputNoteNumber(MODE, midi_in_note);
@@ -113,7 +113,7 @@ while (
 
           midi_out_ch = GLOBAL_CH;
 
-          midisend(offset,midi_in_type+midi_in_channel,midi_out_note_off,midi_out_vel);
+          midisend(offset,midi_in_type+midi_out_ch,midi_out_note_off,midi_out_vel);
 
       );
     ):

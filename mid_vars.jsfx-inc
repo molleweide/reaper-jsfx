@@ -47,7 +47,7 @@ NOTE_OFF=0x80;
 
 SINGLE_ROOT_NOTE = 24; // reset transpose by setting this to 24
 GLOBAL_VEL = 80; // for usage w/QMK that don't send variable velocity
-GLOBAL_CH = 1; // how do I set channel 1?
+GLOBAL_CH = 0; // how do I set channel 1?
 
 // VIM
 
@@ -121,4 +121,5 @@ KC_GRAND_TRANSPOSE_UP = 25;
 KC_GRAND_TRANSPOSE_DOWN = 24;
 KC_GRAND_TRANSPOSE_RESET = 26;
 KC_GRAND_RESET_ALL_NOTES = 27;
-
+KC_GRAND_DECR_MODE = 28;
+KC_GRAND_INCR_MODE = 29;
