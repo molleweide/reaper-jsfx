@@ -25,13 +25,25 @@ function transpose_down()(
   resetAllNotes();
 );
 
+
+/* function reset_device_mode */
+
+
 function device_mode_decr()
 (
-    MIDI_DEVICE == DEVICE_QMK ? (ret;);
+    (MIDI_DEVICE == DEVICE_QMK && MODE > 1) ?
+    (
+      MODE -= 1;
+      slider3 = MODE;
+    );
 );
 
 function device_mode_incr()
 (
-    MIDI_DEVICE == DEVICE_QMK ? (ret;);
+    (MIDI_DEVICE == DEVICE_QMK && MODE < 5) ?
+  (
+    MODE += 1;
+    slider3 = MODE;
+  )
 );
 

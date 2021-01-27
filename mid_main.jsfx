@@ -17,7 +17,6 @@ import mid_main_funcs.jsfx-inc
   TODOS
 
     - qmk switch device mode
-      if I change mode > update sliders
 
     - mult ch > keep track prev note/ch > force release note offs prev ch onChSwitch()
 
@@ -65,7 +64,7 @@ out_pin:none
 @slider
 SINGLE_ROOT_NOTE = slider1; // rename -> GLOBAL_ROOT
 MIDI_DEVICE = slider2;
-MODE = slider3;
+MODE = slider3;             // rename -> MIDI_DEVICE_MODE
 
 @block
 while (

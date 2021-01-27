@@ -94,6 +94,7 @@ input == KC_QMK_TRANSPOSE_RESET_4 ? SINGLE_ROOT_NOTE = 60;resetAllNotes();
 input == KC_QMK_TRANSPOSE_RESET_5 ? SINGLE_ROOT_NOTE = 72;resetAllNotes();
 input == KC_QMK_TRANSPOSE_PINKY_UP ? transpose_up();
 input == KC_QMK_TRANSPOSE_PINKY_DOWN ? transpose_down();
+
 input == KC_QMK_DECR_MODE ? device_mode_decr();
 input == KC_QMK_INCR_MODE ? device_mode_incr();
 
