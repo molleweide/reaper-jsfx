@@ -11,35 +11,55 @@ import mid_device_piano.jsfx-inc
 import mid_main_funcs.jsfx-inc
 
 /*
-   LINKS
 
-     - MIDI SPEC: http://www.petesqbsite.com/sections/express/issue18/midifilespart1.html
+  LINKS
 
-   TODOS
+    - MIDI SPEC: http://www.petesqbsite.com/sections/express/issue18/midifilespart1.html
 
-    - qmk switch mode with outer kes above transpose keys
-      only change for device...
+  TODOS
 
-    - mult channel
-        I have to force release note with previous ch some so that notes don't get stuck
+    - qmk switch device mode
+      create mode slider for each device. ???
+      if I change mode > update sliders
+
+
+    - mult ch > keep track prev note/ch > force release note offs prev ch onChSwitch()
 
     - add qmk_kit_mode >> so that I can begin to do kit programming.
 
+
+    - new concept: think of n number of regions.
+      1 reg = current single mode
+      2 reg = current split.
+        reg1 > eg. vel
+        reg2 > eg. notes.
+      3 reg = kick,snare,hihats
+      ...
+      ...
+      N reg = one region per key.
+        create a vim language for specifying how I want midi to be laid out.
+        This could be pretty cool and it would be easilly manageable over time
+        since I will try to follow as many practices as possible.
+
+
+  LUA
+    - set default midi device MODE when changing midi input device
+    - lua > force only one rec armed track at once
     - add note numbers to piano roll.
 
-    - vim > play/config
+  VIM
 
-    - action > force only one rec armed track at once
+      just for fun. create an internal vim mode for selecting and updating the
+      midi instrument for current track.
 
-    - config file list of midi devices > create custom command > set midi_device for sel tracks.
-        1. research > are there any good existing stuff
-        2. loop through list and check if exists...
+
 
  */
 
 slider1:24<1,127,1>ROOT
 slider2:0<0,2,1{QMK,GRAND_PIANO,DRUMKIT}>DEVICE
 slider3:0<0,2,1{QMK_SINGLE,QMK_FULL,QMK_SPLIT,GRAND_FULL,QMK_SPLIT_CH}>MODE
+//slider4:<,,{})>QMK_MODE
 
 out_pin:none
 out_pin:none

@@ -8,6 +8,18 @@ function device_has_vel(device)
   r;
 );
 
+function device_mode_decr()
+(
+
+    MIDI_DEVICE == DEVICE_QMK ? ();
+);
+
+function device_mode_incr()
+(
+    MIDI_DEVICE == DEVICE_QMK ? ();
+);
+
+
 function getOutputNoteNumber(mode, note)
   local(r)
 (
