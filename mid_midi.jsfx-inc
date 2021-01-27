@@ -24,3 +24,14 @@ function transpose_down()(
       );
   resetAllNotes();
 );
+
+function device_mode_decr()
+(
+    MIDI_DEVICE == DEVICE_QMK ? (ret;);
+);
+
+function device_mode_incr()
+(
+    MIDI_DEVICE == DEVICE_QMK ? (ret;);
+);
+

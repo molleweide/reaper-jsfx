@@ -63,7 +63,12 @@ function qmk_insideRightSide(note)(
 function qmk_handle_control_keys(mode, input)
 (
 
-  mode == MODE_QMK_SPLIT_VEL_NOTE ? ( ///////////////////////
+  mode == MODE_QMK_SINGLE? (
+    input == KC_QMK_TRANSPOSE_THUMBS_UP ? transpose_up();
+    input == KC_QMK_TRANSPOSE_THUMBS_DOWN? transpose_down();
+  );
+
+  mode == MODE_QMK_SPLIT ? ( ///////////////////////
     L = qmk_insideLeftSide(input);
     L > -1 ? (
       L = L*127/18;
@@ -72,7 +77,7 @@ function qmk_handle_control_keys(mode, input)
       GLOBAL_VEL = floor(L);
     ); // else we return 0 and note will be filtered out
   );
-  mode == MODE_QMK_SPLIT_MULT_CH ? ( /////////////////////////
+  mode == MODE_QMK_SPLIT_CH ? ( /////////////////////////
     L = qmk_insideLeftSide(input);
     L > -1 ? (
       L == 0 ? L = 1;
@@ -81,10 +86,6 @@ function qmk_handle_control_keys(mode, input)
     ); // else we return 0 and note will be filtered out
   );
 
-  mode == MODE_QMK_SINGLE_BASIC ? (
-    input == KC_QMK_TRANSPOSE_THUMBS_UP ? transpose_up();
-    input == KC_QMK_TRANSPOSE_THUMBS_DOWN? transpose_down();
-  );
 
 input == KC_QMK_TRANSPOSE_RESET_1 ? SINGLE_ROOT_NOTE = 24;resetAllNotes();
 input == KC_QMK_TRANSPOSE_RESET_2 ? SINGLE_ROOT_NOTE = 36;resetAllNotes();
@@ -93,9 +94,8 @@ input == KC_QMK_TRANSPOSE_RESET_4 ? SINGLE_ROOT_NOTE = 60;resetAllNotes();
 input == KC_QMK_TRANSPOSE_RESET_5 ? SINGLE_ROOT_NOTE = 72;resetAllNotes();
 input == KC_QMK_TRANSPOSE_PINKY_UP ? transpose_up();
 input == KC_QMK_TRANSPOSE_PINKY_DOWN ? transpose_down();
-
 input == KC_QMK_DECR_MODE ? device_mode_decr();
-input == KC_QMK_INCR_MODE ? device_modeo_incr();
+input == KC_QMK_INCR_MODE ? device_mode_incr();
 
     resetAllNotes(); // mv to if press KC_QMK_RESET_ALL_MIDI
 );
