@@ -1,4 +1,4 @@
-desc: molleweide custom midi device preprocessor
+desc: reaper keys midi extension
 author: molleweide
 version: 1.0
 
@@ -15,9 +15,6 @@ import mid_main_funcs.jsfx-inc
     - MIDI SPEC: http://www.petesqbsite.com/sections/express/issue18/midifilespart1.html
 
   TODOS
-
-    - qmk switch device mode
-
     - mult ch > keep track prev note/ch > force release note offs prev ch onChSwitch()
 
     - add qmk_kit_mode >> so that I can begin to do kit programming.
