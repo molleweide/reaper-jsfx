@@ -1,12 +1,12 @@
-desc: reaper keys midi extension
+desc: reaper-jsfx midi-rec-pre
 author: molleweide
 version: 1.0
 
-import mid_vars.jsfx-inc
-import mid_midi.jsfx-inc
-import mid_device_qmk.jsfx-inc
-import mid_device_piano.jsfx-inc
-import mid_main_funcs.jsfx-inc
+import ./lib/mid_vars.jsfx-inc
+import ./lib/mid_midi.jsfx-inc
+import ./midi_devices/mid_device_qmk.jsfx-inc
+import ./midi_devices/mid_device_piano.jsfx-inc
+import ./lib/mid_main_funcs.jsfx-inc
 
 /*
 
@@ -34,7 +34,6 @@ import mid_main_funcs.jsfx-inc
 
 
   LUA
-    - set default midi device MODE when changing midi input device
     - lua > force only one rec armed track at once
     - add note numbers to piano roll.
 
@@ -46,8 +45,6 @@ import mid_main_funcs.jsfx-inc
 
       just for fun. create an internal vim mode for selecting and updating the
       midi instrument for current track.
-
-
 
  */
 
