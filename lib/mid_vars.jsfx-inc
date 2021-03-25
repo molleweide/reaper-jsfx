@@ -1,7 +1,11 @@
 @init
 /*
 
-everithing needs to be as generlized and modularized as possible.
+
+- refactor the keyboard model into its own file
+
+- keep othr stuff in common_vars.jsfx-inc
+
 
 */
 
@@ -14,39 +18,58 @@ CHANNEL_MASK=0x0F;
 NOTE_ON=0x90;
 NOTE_OFF=0x80;
 
-
 SINGLE_ROOT_NOTE = 24; // reset transpose by setting this to 24
-GLOBAL_VEL = 80; // for usage w/QMK that don't send variable velocity
-GLOBAL_CH = 0; // how do I set channel 1?
-
-// VIM
-
-/* VIM_MODE_PLAY = 1; */
-/* VIM_MODE_CONFIG = 2; */
-/* VIM_MODE = VIM_MODE_PLAY; */
+GLOBAL_VEL = 80; // for usage w/QMK that don't send variable velocity // reset global vel?? when?
+GLOBAL_CH = 0; // how do I set channel 1? // reset? when?
 
 // DEVICES ///////////////////////////////////////
-DEVICE_VIRTUAL = 0;
+DEVICE_VKB = 0;
 DEVICE_QMK = 1;
 DEVICE_PIANO_FULL = 2;
 
 
 // make qmk and vkb into one single ??
 // DEVICE MODES /////////////////////////////////
+//
+// i have hardcoded lo/hi because i haven't come up
+// with a good strategy for decoupling these variables
+// into sliders. ideally all of this should be done
+// by checking length of some list/slider param for
+// each device or somthing...
+
+MODE_VKB_LO       = 0;
+MODE_VKB_HI       = 3;
 MODE_VKB_SINGLE       = 0;
 MODE_VKB_LINEAR       = 1;
 MODE_VKB_SPLIT_VEL    = 2;
 MODE_VKB_SPLIT_CH     = 3;
+
+MODE_QMK_LO       = 4;
+MODE_QMK_HI       = 8;
 MODE_QMK_SINGLE       = 4;
 MODE_QMK_FULL         = 5;
 MODE_QMK_SPLIT        = 6;
 MODE_QMK_SPLIT_CH     = 7;
 MODE_QMK_KIT          = 8;
+
+MODE_PIANO_LO     = 9;
+MODE_PIANO_HI     = 10;
 MODE_PIANO_FULL       = 9;
 MODE_PIANO_FULL_SPLIT = 10;
 
+
+// NOTE SHIFT NORMALIZE VARS
+// the idea is that default output should be for lower left `z` 24
+// so you have to apply a shift to each device to be sure that they are all synced
+// with time a nice config file template should spring up here...
+VK_NOTE_SHIFT_NORMALIZE = 24;
+QMK_NOTE_SHIFT_NORMALIZE = 48;
+GPAND_PIANO_NOTE_SHIFT_NORMALIZE = 24;
+
+
+
+
 // QMK VARIABLES
-QMK_NOTE_SHIFT_NORMALIZE = 48; // i have to look this up
 QMK_FULL_HIGH = 85;
 QMK_FULL_LOW = 48;
 QMK_SINGLE_HIGH = QMK_FULL_HIGH;
@@ -72,7 +95,6 @@ QMK_THUMB_INNER_L1 = 51;
 QMK_THUMB_INNER_R1 = 52;
 
 // grand piano variables
-GPAND_PIANO_NOTE_SHIFT_NORMALIZE = 24;
 GRAND_PIANO_HIGH = 108;
 GRAND_PIANO_LOW = 33;
 
@@ -155,6 +177,10 @@ VK_LOW_L_START = 0;
 //
 // MIDI COMMANDS BELOW
 //
+// if I add int midi number keycodes to qmk, then
+// it will be easy to use the keyboard model for all keyb.
+// >>> i can remove this
+//
 ////////////////////////////////////////////
 
 KC_QMK_TRANSPOSE_THUMBS_DOWN = 50;
@@ -176,24 +202,3 @@ KC_GRAND_TRANSPOSE_RESET = 26;
 KC_GRAND_RESET_ALL_NOTES = 27;
 KC_GRAND_DECR_MODE = 28;
 KC_GRAND_INCR_MODE = 29;
-
-// backslash, paragpaph-s, and backspace hasn't been
-// added to rk yet.
-KC_VKB_SPACE = 30;
-KC_VKB_TAB = 31;
-KC_VKB_RETURN = 32;
-KC_VKB_SQUOTE = 33;
-KC_VKB_LBRACKET = 34;
-KC_VKB_RBRACKET = 35;
-KC_VKB_1        = 36;
-KC_VKB_2        = 37;
-KC_VKB_3        = 38;
-KC_VKB_4        = 39;
-KC_VKB_5        = 40;
-KC_VKB_6        = 41;
-KC_VKB_7        = 42;
-KC_VKB_8        = 43;
-KC_VKB_9        = 44;
-KC_VKB_0        = 45;
-KC_VKB_MINUS    = 46;
-KC_VKB_EQUALS   = 47;
