@@ -1,0 +1,113 @@
+@init
+
+// this is unnecessary with laptop keyboard.
+
+/* function qmk_inside_reduced(note) */
+/*   local(r) */
+/* ( */
+/*   r = 0; */
+/*   ((note >= QMK_SINGLE_LOW && note <= QMK_SINGLE_HIGH) */
+/*       || note == QMK_THUMB_INNER_L1 || note == QMK_THUMB_INNER_R1) */
+/*   ? r = 1; */
+/*   r; */
+/* ); */
+
+function keyb_inside_inner_both(note)
+  local(r)
+(
+  r = 0;
+  (note >= QMK_FULL_LOW && note <= QMK_FULL_HIGH)
+   ? r = 1;
+  r;
+);
+
+// 1. start with inner rows.
+// 2. then add thumb keys later.
+// 3. allow for overwriting/customizing how u want the
+//    thumb keys in the devices files.
+// 4. it seems easier to add variable thumb keys afterwards.
+
+function keyb_inside_inner_left(note)(
+  retval = -1;
+    (QMK_ROW_HIGH_L_START <= note && note <= QMK_ROW_HIGH_L_END) ? (
+      retval = note - QMK_NOTE_SHIFT_NORMALIZE - 14;
+    );
+    (QMK_ROW_MID_L_START <= note && note <= QMK_ROW_MID_L_END) ? (
+      retval = note - QMK_NOTE_SHIFT_NORMALIZE - 9;
+    );
+    (QMK_ROW_LOW_L_START <= note && note <= QMK_ROW_LOW_L_END) ? (
+      retval = note - QMK_NOTE_SHIFT_NORMALIZE - 4;
+    );
+    (QMK_ROW_BOTTOM_L_START <= note && note <= QMK_ROW_BOTTOM_L_END) ? (
+      retval = note - QMK_NOTE_SHIFT_NORMALIZE;
+    );
+    QMK_THUMB_INNER_L1 == note ? (
+      retval = note - QMK_NOTE_SHIFT_NORMALIZE;
+    );
+  retval;
+);
+
+function keyb_inside_inner_right(note)(
+  retval = -1;
+    (QMK_ROW_HIGH_R_START <= note && note <= QMK_ROW_HIGH_R_END) ? (
+      retval = note - QMK_NOTE_SHIFT_NORMALIZE - 19;
+    );
+    (QMK_ROW_MID_R_START <= note && note <= QMK_ROW_MID_R_END) ? (
+      retval = note - QMK_NOTE_SHIFT_NORMALIZE - 14;
+    );
+    (QMK_ROW_LOW_R_START <= note && note <= QMK_ROW_LOW_R_END) ? (
+      retval = note - QMK_NOTE_SHIFT_NORMALIZE - 9;
+    );
+    (QMK_ROW_BOTTOM_R_START <= note && note <= QMK_ROW_BOTTOM_R_END) ? (
+      retval = note - QMK_NOTE_SHIFT_NORMALIZE - 4;
+    );
+    QMK_THUMB_INNER_R1 == note ? (
+      retval = note - QMK_NOTE_SHIFT_NORMALIZE - 4;
+    );
+  retval;
+);
+
+function keyb_controller_keys(mode, input)
+(
+  mode == MODE_QMK_SINGLE? (
+    input == KC_QMK_TRANSPOSE_THUMBS_UP ? transpose_up();
+    input == KC_QMK_TRANSPOSE_THUMBS_DOWN? transpose_down();
+  );
+  mode == MODE_QMK_SPLIT ? ( ///////////////////////
+    L = qmk_insideLeftSide(input);
+    L > -1 ? (
+      L = L*127/18;
+      L < 1 ? L = 1;
+      L > 127 ? L = 127;
+      GLOBAL_VEL = floor(L);
+    ); // else we return 0 and note will be filtered out
+  );
+  mode == MODE_QMK_SPLIT_CH ? ( /////////////////////////
+    L = qmk_insideLeftSide(input);
+    L > -1 ? (
+      L == 0 ? L = 1;
+      L > 16 ? L = 16;
+      GLOBAL_CH = L;
+    ); // else we return 0 and note will be filtered out
+  );
+
+input == KC_QMK_TRANSPOSE_RESET_1 ? SINGLE_ROOT_NOTE = 24;resetAllNotes();
+input == KC_QMK_TRANSPOSE_RESET_2 ? SINGLE_ROOT_NOTE = 36;resetAllNotes();
+input == KC_QMK_TRANSPOSE_RESET_3 ? SINGLE_ROOT_NOTE = 48;resetAllNotes();
+input == KC_QMK_TRANSPOSE_RESET_4 ? SINGLE_ROOT_NOTE = 60;resetAllNotes();
+input == KC_QMK_TRANSPOSE_RESET_5 ? SINGLE_ROOT_NOTE = 72;resetAllNotes();
+input == KC_QMK_TRANSPOSE_PINKY_UP ? transpose_up();
+input == KC_QMK_TRANSPOSE_PINKY_DOWN ? transpose_down();
+
+input == KC_QMK_DECR_MODE ? device_mode_decr();
+input == KC_QMK_INCR_MODE ? device_mode_incr();
+
+    resetAllNotes(); // mv to if press KC_QMK_RESET_ALL_MIDI
+);
+
+
+
+
+
+
+

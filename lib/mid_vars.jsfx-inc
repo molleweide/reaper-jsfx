@@ -3,6 +3,81 @@
 /*
     TODO
 
+    when creating new instrument templates
+    add
+      - ranges top/low
+
+    put device specific variables in its own device file?
+
+    keep common stuff back here?
+
+
+
+    it should be possible to generalize
+    the qmk/laptop keyboard into a general set of variables
+    that i can/have to set how?
+
+
+    !!!!!!
+    for simplicity to make qmk keyboards and laptop
+    sync up. add midi notes starting from 0 from z up
+    to right pinky and then a top bar with two outer
+    pillars
+
+    then you can extend and add extra to custom
+    thumb keys etc and what not but the basic
+    layout will always be the same.
+
+    i am personally also shifting the lower left
+    row out one key so that z is under my L pinky
+    and replace b key with any key you like
+
+
+    KEYBOARD // ASSUMING US QWERTY
+
+    LEFT TO RIGHT NUMBERS
+
+      ASSUMED DEFAULT LAYOUT
+
+        NUMBER L / R    10    30 - 34 | 35 - 39
+          num_p_L_0
+          num_p_L_1
+          num_p_R_0
+          num_p_R_1
+        TOP L / R       10    20 - 24 | 25 - 29
+          top_p_L_0
+          top_p_L_1
+        MID L / R       10    10 - 14 | 15 - 19
+          mid_p_L_0
+          mid_p_L_1
+          mid_p_R_0
+          mid_p_R_1
+        BOTTOM L / R    10    00 - 04 | 05 - 09
+          bottom_p_L_out_0 =
+          bottom_p_R_out_0 =
+
+        THUMB L / R
+          tl_0,1,2,3
+          tr_0,1
+            if single inner thumb (big space)
+              tl/tr = the same
+
+      KEYS OFTEN MODIFIED
+
+
+        spc, tab, return, bspc, esc, `
+
+        '\ [] -=
+
+        § <<<< ????
+
+      THIS IS A GOOD IDEA
+
+      small_k,2,3
+
+        has double/split space?
+
+
 */
 
 // MIDI HELPER VARIABLE
@@ -11,38 +86,8 @@ PASS_THRU_CC = 0;
 
 TYPE_MASK=0xF0;
 CHANNEL_MASK=0x0F;
-//OMNI=0x00;
 NOTE_ON=0x90;
 NOTE_OFF=0x80;
-//IN_GM=0x00;
-//ORPHAN_KILL=0x00;
-//ORPHAN_REMAP=0x01;
-//OUT_AD=0x00;
-//OUT_BFD=0x01;
-//OUT_SD=0x02;
-//GM_ACOUSTIC_BASS_DRUM=35;
-//GM_BASS_DRUM_1=36;
-//GM_SIDE_STICK=37;
-//GM_ACOUSTIC_SNARE=38;
-//GM_ELECTRIC_SNARE=40;
-//GM_LOW_FLOOR_TOM=41;
-//GM_CLOSED_HI_HAT=42;
-//GM_HIGH_FLOOR_TOM=43;
-//GM_PEDAL_HI_HAT=44;
-//GM_LOW_TOM=45;
-//GM_OPEN_HI_HAT=46;
-//GM_LOW_MID_TOM=47;
-//GM_HI_MID_TOM=48;
-//GM_CRASH_CYMBAL_1=49;
-//GM_HIGH_TOM=50;
-//GM_RIDE_CYMBAL_1=51;
-//GM_CHINESE_CYMBAL=52;
-//GM_RIDE_BELL=53;
-//GM_SPLASH_CYMBAL=55;
-//GM_CRASH_CYMBAL_2=57;
-//GM_RIDE_CYMBAL_2=59;
-// GLOBAL OPTIONS
-
 
 
 SINGLE_ROOT_NOTE = 24; // reset transpose by setting this to 24
@@ -55,20 +100,22 @@ GLOBAL_CH = 0; // how do I set channel 1?
 /* VIM_MODE_CONFIG = 2; */
 /* VIM_MODE = VIM_MODE_PLAY; */
 
-// DEVICES ..............
+// DEVICES ///////////////////////////////////////
 DEVICE_VIRTUAL = 0;
 DEVICE_QMK = 1;
 DEVICE_PIANO_FULL = 2;
 
-// DEVICE MODES..........
-MODE_VIRTUAL_KEYBOARD = 0;
-MODE_QMK_SINGLE       = 1;
-MODE_QMK_FULL         = 2;
-MODE_QMK_SPLIT        = 3;
-MODE_QMK_SPLIT_CH     = 4;
-MODE_QMK_KIT          = 5;
-MODE_PIANO_FULL       = 6;
-MODE_PIANO_FULL_SPLIT = 7;
+// DEVICE MODES /////////////////////////////////
+MODE_VKB_SINGLE       = 0;
+MODE_VKB_LINEAR       = 1;
+MODE_VKB_SPLIT        = 2;
+MODE_QMK_SINGLE       = 3;
+MODE_QMK_FULL         = 4;
+MODE_QMK_SPLIT        = 5;
+MODE_QMK_SPLIT_CH     = 6;
+MODE_QMK_KIT          = 7;
+MODE_PIANO_FULL       = 8;
+MODE_PIANO_FULL_SPLIT = 9;
 
 // QMK VARIABLES
 QMK_NOTE_SHIFT_NORMALIZE = 48; // i have to look this up
@@ -101,11 +148,98 @@ GPAND_PIANO_NOTE_SHIFT_NORMALIZE = 24;
 GRAND_PIANO_HIGH = 108;
 GRAND_PIANO_LOW = 33;
 
+///////////////////////////////////////////////////
+// VKB //////////////////////////////////////////
+///////////////////////////////////////////////////
+VKB_NOTES_HIGH = 29;
+VKB_NOTES_LOW = 0;
 
-// qmk command keys
+// everithing is centered around a column/rows
+// orthogonal layout. look at this and then create
+// a midi layout that matches with this for you.
+
+// KEYBOARD / PINKY / OUTER KEYS
+//
+// the commented chars represent what key this is on a
+// standard macbook pro us international qwerty keyboard.
+
+VKB_NUM_PR_3 = 73; // backspace
+VKB_NUM_PR_2 = 72; // =
+VKB_NUM_PR_1 = 71; // -
+VKB_NUM_PL_3 = 70;
+VKB_NUM_PL_2 = 69;
+VKB_NUM_PL_1 = 68;
+
+VKB_TOP_PR_3 = 67; // also return (if return takes up two..just for reference..)
+VKB_TOP_PR_2 = 66; // ]
+VKB_TOP_PR_1 = 65; // [
+VKB_TOP_PL_3 = 64;
+VKB_TOP_PL_2 = 63;
+VKB_TOP_PL_1 = 62; // tab
+
+VKB_MID_PR_3 = 61; // return
+VKB_MID_PR_2 = 60; // \
+VKB_MID_PR_1 = 59; // '
+VKB_MID_PL_3 = 58;
+VKB_MID_PL_2 = 57;
+VKB_MID_PL_1 = 56;
+
+VKB_BTM_PR_3 = 55;
+VKB_BTM_PR_2 = 54;
+VKB_BTM_PR_1 = 53;
+VKB_BTM_PL_3 = 52;
+VKB_BTM_PL_2 = 51;
+VKB_BTM_PL_1 = 50;
+
+// this is the row below `zxcvb` where you have spacebar.
+// since this can vary a lot i put it above
+
+VKB_THUMB_R4 = 49
+VKB_THUMB_R3 = 48
+VKB_THUMB_R2 = 47
+VKB_THUMB_R1 = 46 // return
+VKB_THUMB_R0 = 45 // R0 = L0
+
+VKB_THUMB_L4 = 44
+VKB_THUMB_L3 = 43
+VKB_THUMB_L2 = 42
+VKB_THUMB_L1 = 41 // tab
+VKB_THUMB_L0 = 40
+
+VKB_NUM_9 = 39;
+VKB_NUM_8 = 38;
+VKB_NUM_7 = 37;
+VKB_NUM_6 = 36;
+VKB_NUM_5 = 35;
+VKB_NUM_4 = 34;
+VKB_NUM_3 = 33;
+VKB_NUM_2 = 32;
+VKB_NUM_1 = 31;
+VKB_NUM_0 = 30;
+
+VKB_ROW_HIGH_R_END = 29;
+VKB_ROW_HIGH_R_START = 25;
+VKB_ROW_HIGH_L_END = 24;
+VKB_ROW_HIGH_L_START = 20;
+VKB_ROW_MID_R_END = 19;
+VKB_ROW_MID_R_START = 15;
+VKB_ROW_MID_L_END = 14;
+VKB_ROW_MID_L_START = 10;
+VKB_ROW_LOW_R_END = 9;
+VKB_ROW_LOW_R_START = 5;
+VKB_ROW_LOW_L_END = 4;
+VKB_ROW_LOW_L_START = 0;
+
+
+//////////////////////////////////////////////////
+//
+// MIDI COMMANDS BELOW
+//
+////////////////////////////////////////////
+
 KC_QMK_TRANSPOSE_THUMBS_DOWN = 50;
 KC_QMK_TRANSPOSE_THUMBS_UP = 53;
-KC_QMK_TRANSPOSE_PINKY_UP = 115;
+KC_QMK_TRANSPOSE_PINKY_UP = 115; // pinky up/down left/rigth
 KC_QMK_TRANSPOSE_PINKY_DOWN = 110;
 KC_QMK_DECR_MODE = 111;
 KC_QMK_INCR_MODE = 116;
@@ -116,10 +250,30 @@ KC_QMK_TRANSPOSE_RESET_4 = 89;
 KC_QMK_TRANSPOSE_RESET_5 = 90;
 //KC_QMK_RESET_ALL_MIDI = ???;
 
-// grand piano command keys
 KC_GRAND_TRANSPOSE_UP = 25;
 KC_GRAND_TRANSPOSE_DOWN = 24;
 KC_GRAND_TRANSPOSE_RESET = 26;
 KC_GRAND_RESET_ALL_NOTES = 27;
 KC_GRAND_DECR_MODE = 28;
 KC_GRAND_INCR_MODE = 29;
+
+// backslash, paragpaph-s, and backspace hasn't been
+// added to rk yet.
+KC_VKB_SPACE = 30;
+KC_VKB_TAB = 31;
+KC_VKB_RETURN = 32;
+KC_VKB_SQUOTE = 33;
+KC_VKB_LBRACKET = 34;
+KC_VKB_RBRACKET = 35;
+KC_VKB_1        = 36;
+KC_VKB_2        = 37;
+KC_VKB_3        = 38;
+KC_VKB_4        = 39;
+KC_VKB_5        = 40;
+KC_VKB_6        = 41;
+KC_VKB_7        = 42;
+KC_VKB_8        = 43;
+KC_VKB_9        = 44;
+KC_VKB_0        = 45;
+KC_VKB_MINUS    = 46;
+KC_VKB_EQUALS   = 47;
