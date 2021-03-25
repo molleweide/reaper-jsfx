@@ -15,6 +15,10 @@ function getOutputNoteNumber(mode, note)
 (
   r = 0;
 
+    // VKB //////////////////////////////////////////////////////
+
+    // put everything here in
+
     mode == MODE_VKB_SINGLE ? (
       vkb_inside(note) ? r= SINGLE_ROOT_NOTE;
     );
@@ -31,7 +35,13 @@ function getOutputNoteNumber(mode, note)
       );
     );
 
+    // ADD BOTTOM THUMBS ::: if thumbs >> shift inject here
 
+
+
+
+
+    // QMK ////////////////////////////////////////////////////////
 
     mode == MODE_QMK_SINGLE ? (
       qmk_inside_reduced(note) ? r= SINGLE_ROOT_NOTE;
@@ -43,17 +53,19 @@ function getOutputNoteNumber(mode, note)
       );
     );
 
-    mode == MODE_QMK_SPLIT ? ( ///////////////////////
+    mode == MODE_QMK_SPLIT ? (
       // left side is handled as control key below..
       // feels stupid?
       R = qmk_insideRightSide(note);
       R > -1 ? r= SINGLE_ROOT_NOTE + R;
     );
 
-    mode == MODE_QMK_SPLIT_CH ? ( /////////////////////////
+    mode == MODE_QMK_SPLIT_CH ? (
       R = qmk_insideRightSide(note);
       R > -1 ? r= SINGLE_ROOT_NOTE + R;
     );
+
+    // PIANO ////////////////////////////////////////////////
 
     mode == MODE_PIANO_FULL ? (
       grand_piano_inside_full(note) ? r = SINGLE_ROOT_NOTE + note - GPAND_PIANO_NOTE_SHIFT_NORMALIZE;
@@ -66,7 +78,8 @@ function getOutputNoteNumber(mode, note)
     r;
 );
 
-// call respective device control functions from here
+// CONTROLLER KEYS // :::::::::::::::::::::::::::::::::::::::::::::
+
 function handleControlKeys(device, mode, input)(
     //device == DEVICE_VIRTUAL ? qmk_handle_control_keys(mode, input);
     device == DEVICE_QMK ? qmk_handle_control_keys(mode, input);
