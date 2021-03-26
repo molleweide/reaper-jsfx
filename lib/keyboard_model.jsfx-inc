@@ -1,0 +1,97 @@
+//////////////////////////////////////////////////////////////
+//
+// VIRTUAL KEYBOARD MODEL
+//
+// orthogonal keyboard mapping reference guide
+//
+//////////////////////////////////////////////////////////////
+//
+//  add long list of all thirty regular keys. so that you can
+//  create piano mappings and similar stuff inside of templates
+//
+//
+
+VKB_NOTES_HIGH = 29;
+VKB_NOTES_LOW = 0;
+
+VK_NUM_OUTER_R_3 = 73; // backspace
+VK_NUM_OUTER_R_2 = 72; // =
+VK_NUM_OUTER_R_1 = 71; // -
+VK_NUM_OUTER_L_3 = 70;
+VK_NUM_OUTER_L_2 = 69;
+VK_NUM_OUTER_L_1 = 68;
+
+VK_TOP_OUTER_R_3 = 67; // also return (if return takes up two..just for reference..)
+VK_TOP_OUTER_R_2 = 66; // ]
+VK_TOP_OUTER_R_1 = 65; // [
+VK_TOP_OUTER_L_3 = 64;
+VK_TOP_OUTER_L_2 = 63;
+VK_TOP_OUTER_L_1 = 62; // tab
+
+VK_MID_OUTER_R_3 = 61; // return
+VK_MID_OUTER_R_2 = 60; // \
+VK_MID_OUTER_R_1 = 59; // '
+VK_MID_OUTER_L_3 = 58;
+VK_MID_OUTER_L_2 = 57;
+VK_MID_OUTER_L_1 = 56;
+
+VK_BTM_OUTER_R_3 = 55;
+VK_BTM_OUTER_R_2 = 54;
+VK_BTM_OUTER_R_1 = 53;
+VK_BTM_OUTER_L_3 = 52;
+VK_BTM_OUTER_L_2 = 51;
+VK_BTM_OUTER_L_1 = 50;
+
+// THUMB KEYS 40 - 49
+
+VK_THUMB_HI = 49;
+
+VK_THUMB_R4 = 49;
+VK_THUMB_R3 = 48;
+VK_THUMB_R2 = 47;
+VK_THUMB_R1 = 46; // return
+VK_THUMB_R0 = 45; // R0 = L0
+VK_THUMB_L4 = 44;
+VK_THUMB_L3 = 43;
+VK_THUMB_L2 = 42;
+VK_THUMB_L1 = 41; // tab
+VK_THUMB_L0 = 40;
+
+VK_THUMB_LO = 40;
+
+
+// NUM KEYS 30 - 39
+
+VK_NUM_9 = 39;
+VK_NUM_8 = 38;
+VK_NUM_7 = 37;
+VK_NUM_6 = 36;
+VK_NUM_5 = 35;
+VK_NUM_4 = 34;
+VK_NUM_3 = 33;
+VK_NUM_2 = 32;
+VK_NUM_1 = 31;
+VK_NUM_0 = 30;
+
+// put regular list of keys below here
+// named according to us standard qwerty.
+// so that it becomes easy to shift them around
+
+
+VK_TOP_R_END = 29;
+VK_TOP_R_START = 25;
+VK_TOP_L_END = 24;
+VK_TOP_L_START = 20;
+VK_MID_R_END = 19;
+VK_MID_R_START = 15;
+VK_MID_L_END = 14;
+VK_MID_L_START = 10;
+VK_LOW_R_END = 9;
+VK_LOW_R_START = 5;
+VK_LOW_L_END = 4;
+VK_V = 4;
+VK_D = 3;
+VK_C = 2;
+VK_X = 1;
+VK_Z = 0;
+VK_LOW_L_START = 0;

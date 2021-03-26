@@ -2,51 +2,17 @@ desc: reaper-jsfx midi-rec-pre
 author: molleweide
 version: 1.0
 
-import ./lib/mid_vars.jsfx-inc
-import ./lib/mid_midi.jsfx-inc
+import ./lib/variables.jsfx-inc
+import ./lib/midi_controller.jsfx-inc
+import ./lib/device_keyb_base.jsfx-inc
+import ./lib/device_piano_base.jsfx-inc
+
+import ./midi_devices/midi_device_virtual_keyb.jsfx-inc
+import ./midi_devices/midi_device_ergodox_ez.jsfx-inc
 import ./midi_devices/mid_device_qmk.jsfx-inc
 import ./midi_devices/mid_device_piano.jsfx-inc
-import ./lib/mid_main_funcs.jsfx-inc
 
-/*
-
-  LINKS
-
-    - MIDI SPEC: http://www.petesqbsite.com/sections/express/issue18/midifilespart1.html
-
-  TODOS
-    - mult ch > keep track prev note/ch > force release note offs prev ch onChSwitch()
-
-    - add qmk_kit_mode >> so that I can begin to do kit programming.
-
-    - new concept: think of n number of regions.
-      1 reg = current single mode
-      2 reg = current split.
-        reg1 > eg. vel
-        reg2 > eg. notes.
-      3 reg = kick,snare,hihats
-      ...
-      ...
-      N reg = one region per key.
-        create a vim language for specifying how I want midi to be laid out.
-        This could be pretty cool and it would be easilly manageable over time
-        since I will try to follow as many practices as possible.
-
-
-  LUA
-    - lua > force only one rec armed track at once
-    - add note numbers to piano roll.
-
-  NVIM
-
-    disable indentation function `=` for eel???
-
-  MIDI VIM
-
-      just for fun. create an internal vim mode for selecting and updating the
-      midi instrument for current track.
-
- */
+import ./lib/handle_keys.jsfx-inc
 
 slider1:24<1,127,1>ROOT
 slider2:0<0,2,1{VIRTUAL_KEYBOARD,QMK,PIANO_FULL}>DEVICE
@@ -62,32 +28,40 @@ MODE = slider3;             // rename -> MIDI_DEVICE_MODE
 
 @block
 while (
+
   input = midirecv(offset,msg1,msg2,msg3);
+
   input ? (
+
     midi_in_type = msg1&TYPE_MASK;
     midi_in_channel = msg1&CHANNEL_MASK;
     midi_in_note = msg2;
     midi_in_vel = msg3;
 
+
     // note on /////////////////////////////////////////////
     midi_in_type == NOTE_ON && midi_in_vel > 0 ? (
 
-      midi_out_note_on = getOutputNoteNumber(MODE, midi_in_note);
+      midi_out_note_on = handleMidiKeys(MODE, midi_in_note);
 
-      (midi_out_note_on > 0) ? (
+      (midi_out_note_on > 0) ? ( // IF MIDI NOTE <<<
+
+
 
         device_has_vel(MIDI_DEVICE) ? midi_out_vel = midi_in_vel : midi_out_vel = GLOBAL_VEL;
-
-        // will this cause problems if I switch ch mid note down?
-        // keep track of it first is note off then use prev ch??? hmmm??
         midi_out_ch = GLOBAL_CH;
-
         midisend(offset,midi_in_type+midi_out_ch,midi_out_note_on,midi_out_vel);
 
-      ):(
+
+
+      ):( // ELSE
+
+
 
         WAS_FILTERED[midi_in_note] = 1;
         handleControlKeys(MIDI_DEVICE, MODE, midi_in_note);
+
+
 
       );
     ):
@@ -95,19 +69,23 @@ while (
     // NOTE OFF ////////////////////////////////////////////
     midi_in_type == NOTE_OFF || (midi_in_type == NOTE_ON && midi_in_vel == 0 ) ? (
 
+
+
       WAS_FILTERED[midi_in_note] ? (
 
         WAS_FILTERED[midi_in_note] = 0;
 
+
+
       ):(
 
-          midi_out_note_off = getOutputNoteNumber(MODE, midi_in_note);
+
+          midi_out_note_off = handleMidiKeys(MODE, midi_in_note);
 
           device_has_vel(MIDI_DEVICE) ? midi_out_vel = midi_in_vel : midi_out_vel = GLOBAL_VEL;
-
           midi_out_ch = GLOBAL_CH;
-
           midisend(offset,midi_in_type+midi_out_ch,midi_out_note_off,midi_out_vel);
+
 
       );
     ):

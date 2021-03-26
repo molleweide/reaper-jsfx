@@ -1,0 +1,11 @@
+@init
+
+function is_thumb_key?(note)
+  local(r)
+(
+  r=0;
+  (40 <= note && note <= 49) ? r = 1;
+  r;
+);
+
+

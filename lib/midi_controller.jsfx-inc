@@ -1,5 +1,13 @@
 @init
 
+function device_has_vel(device)
+  local(r)
+(
+  r=0;
+  (device == DEVICE_QMK || device == DEVICE_VIRTUAL) ? r = 0 ? r = 1;
+  r;
+);
+
 function resetAllNotes()
 (
   // loop through all notes
@@ -30,7 +38,8 @@ function transpose_down()(
 
 // can I decouple device from mode with some kind of ui variable
 // so that i don't have to hardcode values here??
-function device_mode_decr()
+
+function mode_decr()
 (
 
     // add vkb
@@ -39,7 +48,7 @@ function device_mode_decr()
     (MIDI_DEVICE == DEVICE_PIANO_FULL && MODE > MODE_PIANO_LO) ? ( MODE -= 1; slider3 = MODE; );
 );
 
-function device_mode_incr()
+function mode_incr()
 (
     (MIDI_DEVICE == DEVICE_VKB && MODE > MODE_VKB_HI) ? ( MODE -= 1; slider3 = MODE; );
     (MIDI_DEVICE == DEVICE_QMK && MODE < MODE_QMK_HI) ? ( MODE += 1; slider3 = MODE; );

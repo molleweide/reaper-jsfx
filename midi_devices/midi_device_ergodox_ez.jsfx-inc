@@ -1,0 +1,104 @@
+@init
+
+// return NOTE NUMBER
+
+function ergodox_ez_modes(mode, note)
+  local(r)
+  local(num_t)
+(
+  r = 0;
+
+  // SINGLE :::::::::::::::::::::::::::
+
+  // rename all modes to ergo_ez
+  mode == MODE_QMK_SINGLE ? (
+    keyb_inside_inner_both(note) ? r = SINGLE_ROOT_NOTE;
+    note == VK_THUMB_L0 ? r = SINGLE_ROOT_NOTE;
+  );
+
+  // LINEAR :::::::::::::::::::::::::::
+
+  mode == MODE_QMK_LINEAR ? (
+    keyb_inside_inner_both(note) ? r = SINGLE_ROOT_NOTE + note;
+    num_t = 8;
+    (40 <= note && note <= 49) ? (
+      note == VK_THUMB_L3 ? r = 0; // notice that i only use 4 thumb keys on my ez
+      note == VK_THUMB_L2 ? r = 1;
+      note == VK_THUMB_L1 ? r = 2;
+      note == VK_THUMB_L0 ? r = 3;
+      note == VK_THUMB_R0 ? r = 4;
+      note == VK_THUMB_R1 ? r = 5;
+      note == VK_THUMB_R2 ? r = 6;
+      note == VK_THUMB_R3 ? r = 7;
+    ):(
+      r += num_t; // shift all other notes by num thumb keys
+    );
+  );
+
+  // SPLIT VEL :::::::::::::::::::::::::::
+
+  mode == MODE_QMK_SPLIT_VEL ? (
+    L = keyb_inside_inner_left(input);
+    L > -1 ? (
+      L = L*127/15;
+      L < 1 ? L = 1;
+      L > 127 ? L = 127;
+      GLOBAL_VEL = floor(L);
+    );
+    R = keyb_inside_inner_right(note) //////////
+    R > -1 ? r = R + SINGLE_ROOT_NOTE;
+    note == VK_THUMB_L0 ? (
+      r = SINGLE_ROOT_NOTE;
+    ):(
+      r += num_t;
+    );
+  );
+
+  // SPLIT CH :::::::::::::::::::::::::::
+
+  mode == MODE_QMK_SPLIT_CH ? (
+    L = keyb_inside_inner_left(input);
+    L > -1 ? (
+      L == 0 ? L = 1;
+      L > 16 ? L = 16;
+      GLOBAL_CH = L;
+    );
+    R = keyb_inside_inner_right(note) //////////
+    R > -1 ? r = R + SINGLE_ROOT_NOTE;
+    note == VK_THUMB_L0 ? (
+      r = SINGLE_ROOT_NOTE;
+    ):(
+      r += num_t;
+    );
+  );
+
+  // :::::::::::::::::::::::::::::::::::
+
+  r;
+)
+
+//////////////////////////////////////////////////////////////////////////
+//
+// CONTROLLER KEYS
+//
+//////////////////////////////////////////////////////////////////////////
+
+function keyb_controller_keys(mode, input)
+(
+  input == VK_NUM_1 ? SINGLE_ROOT_NOTE = 24;resetAllNotes();
+  input == VK_NUM_2 ? SINGLE_ROOT_NOTE = 36;resetAllNotes();
+  input == VK_NUM_3 ? SINGLE_ROOT_NOTE = 48;resetAllNotes();
+  input == VK_NUM_4 ? SINGLE_ROOT_NOTE = 60;resetAllNotes();
+  input == VK_NUM_5 ? SINGLE_ROOT_NOTE = 72;resetAllNotes();
+
+  input == VK_TOP_OUTER_L_1 ? transpose_down();
+  input == VK_MID_OUTER_R_3 ? transpose_up();
+
+  input == VK_TOP_OUTER_R_1 ? device_mode_decr();
+  input == VK_TOP_OUTER_R_2 ? device_mode_incr();
+
+  // mv to if press KC_QMK_RESET_ALL_MIDI? or do after all controller settigs
+  // commands?
+
+  resetAllNotes();
+);
