@@ -3,6 +3,8 @@
 // VIRTUAL KEYBOARD MODEL
 //
 // orthogonal keyboard mapping reference guide
+//  so that it becomes easy to map keyboards and create
+// custom mappings
 //
 //////////////////////////////////////////////////////////////
 //
@@ -13,6 +15,14 @@
 
 VKB_NOTES_HIGH = 29;
 VKB_NOTES_LOW = 0;
+
+
+
+/* VK_TCLUST_L1 = 76; */
+/* VK_TCLUST_R0 = 75; */
+/* VK_TCLUST_L0 = 74; */
+
+
 
 VK_NUM_OUTER_R_3 = 73; // backspace
 VK_NUM_OUTER_R_2 = 72; // =
@@ -76,7 +86,6 @@ VK_NUM_0 = 30;
 // put regular list of keys below here
 // named according to us standard qwerty.
 // so that it becomes easy to shift them around
-
 
 VK_TOP_R_END = 29;
 VK_TOP_R_START = 25;

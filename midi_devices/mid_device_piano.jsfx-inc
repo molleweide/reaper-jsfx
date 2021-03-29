@@ -14,7 +14,7 @@ function piano_handle_control_keys(mode, input)
   input == KC_GRAND_RESET_ALL_NOTES ? resetAllNotes();
   input == KC_GRAND_TRANSPOSE_UP ? transpose_up();
   input == KC_GRAND_TRANSPOSE_DOWN ? transpose_down();
-  input == KC_GRAND_DECR_MODE ? device_mode_decr();
-  input == KC_GRAND_INCR_MODE ? device_mode_incr();
+  input == KC_GRAND_DECR_MODE ? mode_decr();
+  input == KC_GRAND_INCR_MODE ? mode_incr();
 );
 

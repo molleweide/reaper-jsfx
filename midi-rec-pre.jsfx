@@ -3,20 +3,27 @@ author: molleweide
 version: 1.0
 
 import ./lib/variables.jsfx-inc
-import ./lib/midi_controller.jsfx-inc
-import ./lib/device_keyb_base.jsfx-inc
-import ./lib/device_piano_base.jsfx-inc
+import ./lib/keyboard_model.jsfx-inc
+import ./lib/keyboard_util.jsfx-inc
+import ./lib/piano_util.jsfx-inc
 
+import ./lib/midi_controller.jsfx-inc
+
+// include personal device mappings
 import ./midi_devices/midi_device_virtual_keyb.jsfx-inc
 import ./midi_devices/midi_device_ergodox_ez.jsfx-inc
 import ./midi_devices/mid_device_qmk.jsfx-inc
-import ./midi_devices/mid_device_piano.jsfx-inc
+import ./midi_devices/mid_device_piano.jsfx-inc // eg. my roland grand
 
+// make sure midi events are sent to correct
+// device map
 import ./lib/handle_keys.jsfx-inc
+
+//////////////////////////////////////////////////////////////////
 
 slider1:24<1,127,1>ROOT
 slider2:0<0,2,1{VIRTUAL_KEYBOARD,QMK,PIANO_FULL}>DEVICE
-slider3:0<0,7,1{VIRTUAL_KEYBOARD,QMK_SINGLE,QMK_FULL,QMK_SPLIT,QMK_SPLIT_CH,QMK_KIT,PIANO_FULL,PIANO_FULL_SPLIT}>MODE
+slider3:0<0,7,1{VKB_SINGLE,VKB_LINEAR, VKB_SPLIT_VEL, VKB_SPLIT_CH,QMK_SINGLE,QMK_FULL,QMK_SPLIT,QMK_SPLIT_CH,QMK_KIT,PIANO_FULL,PIANO_FULL_SPLIT}>MODE
 
 out_pin:none
 out_pin:none
@@ -44,7 +51,7 @@ while (
 
       midi_out_note_on = handleMidiKeys(MODE, midi_in_note);
 
-      (midi_out_note_on > 0) ? ( // IF MIDI NOTE <<<
+      (midi_out_note_on >= 0) ? ( // IF MIDI NOTE <<<
 
 
 
@@ -82,12 +89,14 @@ while (
 
           midi_out_note_off = handleMidiKeys(MODE, midi_in_note);
 
+          // (midi_out_note_on >= 0) ? ():();
           device_has_vel(MIDI_DEVICE) ? midi_out_vel = midi_in_vel : midi_out_vel = GLOBAL_VEL;
           midi_out_ch = GLOBAL_CH;
           midisend(offset,midi_in_type+midi_out_ch,midi_out_note_off,midi_out_vel);
+      ); // WAS FLT
 
 
-      );
+
     ):
 
     // MIDI CC ////////////////////////////////////////////
