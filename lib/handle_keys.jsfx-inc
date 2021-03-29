@@ -59,7 +59,7 @@ function handleMidiKeys(mode, note)
 // CONTROLLER KEYS // :::::::::::::::::::::::::::::::::::::::::::::
 
 function handleControlKeys(device, mode, input)(
-    //device == DEVICE_VIRTUAL ? qmk_handle_control_keys(mode, input);
-    device == DEVICE_QMK ? qmk_handle_control_keys(mode, input);
-    device == DEVICE_PIANO_FULL ? piano_handle_control_keys(mode, input);
+    MIDI_DEVICE == DEVICE_VKB ? vk_settings(mode, input);
+    MIDI_DEVICE == DEVICE_QMK ? qmk_handle_control_keys(mode, input);
+    MIDI_DEVICE == DEVICE_PIANO_FULL ? piano_handle_control_keys(mode, input);
 );

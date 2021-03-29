@@ -4,7 +4,7 @@ function device_has_vel(device)
   local(r)
 (
   r=0;
-  (device == DEVICE_QMK || device == DEVICE_VIRTUAL) ? r = 0 ? r = 1;
+  (device == DEVICE_QMK || device == DEVICE_VKB) ? r = 0 ? r = 1;
   r;
 );
 
@@ -42,16 +42,16 @@ function transpose_down()(
 function mode_decr()
 (
 
-    // add vkb
-    (MIDI_DEVICE == DEVICE_VKB && MODE > MODE_VKB_LO) ? ( MODE -= 1; slider3 = MODE; );
-    (MIDI_DEVICE == DEVICE_QMK && MODE > MODE_QMK_LO) ? ( MODE -= 1; slider3 = MODE; );
-    (MIDI_DEVICE == DEVICE_PIANO_FULL && MODE > MODE_PIANO_LO) ? ( MODE -= 1; slider3 = MODE; );
+    (MIDI_DEVICE == DEVICE_VKB && MODE > MODE_VKB_LO) ||
+    (MIDI_DEVICE == DEVICE_QMK && MODE > MODE_QMK_LO) ||
+    (MIDI_DEVICE == DEVICE_PIANO_FULL && MODE > MODE_PIANO_LO)
+    ? ( MODE -= 1; slider3 = MODE; );
 );
 
 function mode_incr()
 (
-    (MIDI_DEVICE == DEVICE_VKB && MODE > MODE_VKB_HI) ? ( MODE -= 1; slider3 = MODE; );
-    (MIDI_DEVICE == DEVICE_QMK && MODE < MODE_QMK_HI) ? ( MODE += 1; slider3 = MODE; );
+    (MIDI_DEVICE == DEVICE_VKB && MODE < MODE_VKB_HI) ||
+    (MIDI_DEVICE == DEVICE_QMK && MODE < MODE_QMK_HI) ||
     (MIDI_DEVICE == DEVICE_PIANO_FULL && MODE < MODE_PIANO_HI)
     ? ( MODE += 1; slider3 = MODE; );
 );

@@ -21,11 +21,9 @@ function keyb_modes(mode, note)
   // LINEAR :::::::::::::::::::::::::::
 
   mode == MODE_VKB_LINEAR ? (
-    keyb_inside_inner_both(note) ? r = SINGLE_ROOT_NOTE + note;
+    keyb_inside_inner_both(note) ? r = SINGLE_ROOT_NOTE + note + num_t;
     (40 <= note && note <= 49) ? (
       note == VK_THUMB_L0 ? r = SINGLE_ROOT_NOTE;
-    ):(
-      r += num_t;
     );
   );
 
@@ -41,11 +39,9 @@ function keyb_modes(mode, note)
     );
 
     R = keyb_inside_inner_right(note); //////////
-    R > -1 ? r = R + SINGLE_ROOT_NOTE;
+    R > -1 ? r = R + SINGLE_ROOT_NOTE + num_t;
     is_thumb_key(note) ? (
       note == VK_THUMB_L0 ? r = SINGLE_ROOT_NOTE;
-    ):(
-      r += num_t; // add thumb shift
     );
   );
 
@@ -59,11 +55,9 @@ function keyb_modes(mode, note)
       GLOBAL_CH = L;
     );
     R = keyb_inside_inner_right(note); //////////
-    R > -1 ? r = R + SINGLE_ROOT_NOTE;
+    R > -1 ? r = R + SINGLE_ROOT_NOTE + num_t;
     is_thumb_key(note) ? (
       note == VK_THUMB_L0 ? r = SINGLE_ROOT_NOTE;
-    ):(
-      r += num_t;
     );
   );
 
@@ -74,11 +68,11 @@ function keyb_modes(mode, note)
 
 //////////////////////////////////////////////////////////////////////////
 //
-// CONTROLLER KEYS
+// SETTINGS KEYS
 //
 //////////////////////////////////////////////////////////////////////////
 
-function keyb_controller_keys(mode, input)
+function vk_settings(mode, input)
 (
   input == VK_NUM_1 ? SINGLE_ROOT_NOTE = 24;resetAllNotes();
   input == VK_NUM_2 ? SINGLE_ROOT_NOTE = 36;resetAllNotes();

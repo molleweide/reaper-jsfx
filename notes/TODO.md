@@ -1,11 +1,7 @@
 # REAPER JSFX TODO
 
 
-- note off
-    do i also have o check if greater than 0 here/
+the reason why it is not working is because i am overwriting the
+return value inside of linear r +=
 
-
-
-
-- gui
-
+fix this i all places
