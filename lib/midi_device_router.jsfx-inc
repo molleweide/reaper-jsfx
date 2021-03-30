@@ -1,0 +1,15 @@
+@init
+
+function device_route_midi_events(note, is_note_on)
+  local(r)
+(
+  r = 0;
+
+    DEVICE == VIRTUAL_KEYBOARD ? ( r = virtual_keyboard_map_notes(mode, note); );
+
+    DEVICE == ERGODOX_EZ ? ( r = keyboard_ergodox_ez_map_notes(mode, note - 56); );
+
+    DEVICE == PIANO_GRAND ? ( r = piano_grand_map_notes(mode, note); );
+
+    r;
+);

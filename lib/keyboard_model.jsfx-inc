@@ -7,10 +7,11 @@
 //  so that it becomes easy to map keyboards and create
 // custom mappings
 //
+//
+// qmk pre shift down to zero
+//
 //////////////////////////////////////////////////////////////
 //
-//  add long list of all thirty regular keys. so that you can
-//  create piano mappings and similar stuff inside of templates
 //
 //
 

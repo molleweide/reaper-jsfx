@@ -4,22 +4,13 @@ version: 1.0
 
 import ./lib/variables.jsfx-inc
 import ./lib/keyboard_model.jsfx-inc
-import ./lib/keyboard_util.jsfx-inc
-import ./lib/piano_util.jsfx-inc
-
+import ./lib/util_keyboard.jsfx-inc
+import ./lib/util_keyboard.jsfx-inc
 import ./lib/midi_controller.jsfx-inc
-
-// include personal device mappings
-import ./midi_devices/midi_device_virtual_keyb.jsfx-inc
+import ./midi_devices/midi_device_virtual_keyboard.jsfx-inc
 import ./midi_devices/midi_device_ergodox_ez.jsfx-inc
-import ./midi_devices/mid_device_qmk.jsfx-inc
-import ./midi_devices/mid_device_piano.jsfx-inc
-
-// make sure midi events are sent to correct
-// device map
-import ./lib/handle_keys.jsfx-inc
-
-//////////////////////////////////////////////////////////////////
+import ./midi_devices/midi_device_piano_grand.jsfx-inc
+import ./lib/midi_device_router.jsfx-inc
 
 slider1:24<1,127,1>ROOT
 slider2:0<0,2,1{VIRTUAL_KEYBOARD,QMK,PIANO_FULL}>DEVICE
@@ -29,9 +20,9 @@ out_pin:none
 out_pin:none
 
 @slider
-SINGLE_ROOT_NOTE = slider1; // rename -> GLOBAL_ROOT
-MIDI_DEVICE = slider2;
-MODE = slider3;             // rename -> MIDI_DEVICE_MODE
+GLOBAL_ROOT_NOTE = slider1; // remove this slider
+DEVICE = slider2;
+MODE = slider3;
 
 @block
 while (
@@ -55,7 +46,7 @@ while (
 
 
 
-        device_has_vel(MIDI_DEVICE) ? midi_out_vel = midi_in_vel : midi_out_vel = GLOBAL_VEL;
+        device_has_vel(DEVICE) ? midi_out_vel = midi_in_vel : midi_out_vel = GLOBAL_VEL;
         midi_out_ch = GLOBAL_CH;
         midisend(offset,midi_in_type+midi_out_ch,midi_out_note_on,midi_out_vel);
 
@@ -66,7 +57,7 @@ while (
 
 
         WAS_FILTERED[midi_in_note] = 1;
-        handleControlKeys(MIDI_DEVICE, MODE, midi_in_note);
+        handleControlKeys(DEVICE, MODE, midi_in_note); // remove this
 
 
 
@@ -90,7 +81,7 @@ while (
           midi_out_note_off = handleMidiKeys(MODE, midi_in_note);
 
           (midi_out_note_on >= -1) ? (
-              device_has_vel(MIDI_DEVICE) ? midi_out_vel = midi_in_vel : midi_out_vel = GLOBAL_VEL;
+              device_has_vel(DEVICE) ? midi_out_vel = midi_in_vel : midi_out_vel = GLOBAL_VEL;
               midi_out_ch = GLOBAL_CH;
               midisend(offset,midi_in_type+midi_out_ch,midi_out_note_off,midi_out_vel);
           );

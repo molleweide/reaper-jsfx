@@ -1,15 +1,12 @@
 @init
 
-//
-// return NOTE NUMBER
-//
+// return NOTE output number
+// if not note output >> return -1
 
-function keyboard_ergodox_ez_map_notes(note_in)
-  local(r)
-  local(num_t) // how many thumb keys are used?
+function virtual_keyboard_map_notes(note_in)
+  local(r) local(num_t)
 (
-  r = -1;
-  num_t = 1;
+  r = -1; num_t = 1;
 
   // SINGLE :::::::::::::::::::::::::::
 
@@ -28,8 +25,6 @@ function keyboard_ergodox_ez_map_notes(note_in)
   );
 
   // SPLIT VEL :::::::::::::::::::::::::::
-  // velocity left / pitch right
-  // experimental
 
   MODE == MODE_VKB_SPLIT_VEL ? (
     L = keyb_inside_inner_left(note_in);
@@ -48,8 +43,6 @@ function keyboard_ergodox_ez_map_notes(note_in)
   );
 
   // SPLIT CH :::::::::::::::::::::::::::
-  // ch switch left / pitch right
-  // experimental
 
   MODE == MODE_VKB_SPLIT_CH ? (
     L = keyb_inside_inner_left(note_in);
@@ -65,19 +58,8 @@ function keyboard_ergodox_ez_map_notes(note_in)
     );
   );
 
-  // return :::::::::::::::::::::::::::::::::::
+  // :::::::::::::::::::::::::::::::::::
 
-  r;
-);
-
-//////////////////////////////////////////////////////////////////////////
-//
-// SETTINGS KEYS
-//
-//////////////////////////////////////////////////////////////////////////
-
-function vk_settings(note_in)
-(
   note_in == VK_NUM_1 ? GLOBAL_ROOT_NOTE = 24;resetAllNotes();
   note_in == VK_NUM_2 ? GLOBAL_ROOT_NOTE = 36;resetAllNotes();
   note_in == VK_NUM_3 ? GLOBAL_ROOT_NOTE = 48;resetAllNotes();
@@ -90,4 +72,8 @@ function vk_settings(note_in)
 
   note_in == VK_TOP_OUTER_R_1 ? mode_decr();
   note_in == VK_TOP_OUTER_R_2 ? mode_incr();
+
+  // return ::::::::::::::::::::::::::::
+
+  r;
 );

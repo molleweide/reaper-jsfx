@@ -13,14 +13,14 @@ CHANNEL_MASK=0x0F;
 NOTE_ON=0x90;
 NOTE_OFF=0x80;
 
-SINGLE_ROOT_NOTE = 24; // reset transpose by setting this to 24
-GLOBAL_VEL = 80; // for usage w/QMK that don't send variable velocity // reset global vel?? when?
-GLOBAL_CH = 0; // how do I set channel 1? // reset? when?
+GLOBAL_ROOT_NOTE = 24; // GLOBAL_ROOT_NOTE
+GLOBAL_VEL = 80;
+GLOBAL_CH = 0;
 
 // DEVICES ///////////////////////////////////////
-DEVICE_VKB = 0; // virtual midi keyboard
-DEVICE_QMK = 1;
-DEVICE_PIANO_FULL = 2;
+VIRTUAL_KEYBOARD = 0; // virtual midi keyboard
+ERGODOX_EZ = 1;
+PIANO_GRAND = 2;
 
 
 // make qmk and vkb into one single ??
@@ -34,25 +34,25 @@ DEVICE_PIANO_FULL = 2;
 //
 // how do i work with arrays and stuff in eel???
 
-MODE_VKB_LO       = 0;
-MODE_VKB_HI       = 3;
-MODE_VKB_SINGLE       = 0;
-MODE_VKB_LINEAR       = 1;
-MODE_VKB_SPLIT_VEL    = 2;
-MODE_VKB_SPLIT_CH     = 3;
+VKB_MODE_LO       = 0;
+VKB_MODE_HI       = 3;
+VKB_MODE_SINGLE       = 0;
+VKB_MODE_LINEAR       = 1;
+VKB_MODE_SPLIT_VEL    = 2;
+VKB_MODE_SPLIT_CH     = 3;
 
-MODE_QMK_LO       = 4;
-MODE_QMK_HI       = 8;
-MODE_QMK_SINGLE       = 4;
-MODE_QMK_FULL         = 5;
-MODE_QMK_SPLIT        = 6;
-MODE_QMK_SPLIT_CH     = 7;
-MODE_QMK_KIT          = 8;
+ERGODOX_EZ_MODE_LO        = 4;
+ERGODOX_EZ_MODE_HI        = 8;
+ERGODOX_EZ_MODE_SINGLE        = 4;
+ERGODOX_EZ_MODE_FULL          = 5;
+ERGODOX_EZ_MODE_SPLIT         = 6;
+ERGODOX_EZ_MODE_SPLIT_CH      = 7;
+ERGODOX_EZ_MODE_KIT           = 8;
 
-MODE_PIANO_LO     = 9;
-MODE_PIANO_HI     = 10;
-MODE_PIANO_FULL       = 9;
-MODE_PIANO_FULL_SPLIT = 10;
+PIANO_GRAND_MODE_LO       = 9;
+PIANO_GRAND_MODE_HI       = 10;
+PIANO_GRAND_MODE              = 9;
+PIANO_GRAND_MODE_SPLIT        = 10;
 
 
 // NOTE SHIFT NORMALIZE VARS

@@ -1,10 +1,10 @@
 @init
 
-function device_has_vel(device)
+function device_has_vel()
   local(r)
 (
   r=0;
-  (device == DEVICE_QMK || device == DEVICE_VKB) ? r = 0 ? r = 1;
+  (DEVICE == ERGODOX_EZ || DEVICE == VIRTUAL_KEYBOARD) ? r = 0 ? r = 1;
   r;
 );
 
@@ -20,15 +20,15 @@ function resetAllNotes()
 
 // check limits:  t < 0 ? t = 0 : t > 127 ? t = 127;
 function transpose_up()(
-    SINGLE_ROOT_NOTE < 127 ? (
-      SINGLE_ROOT_NOTE += 1;
+    GLOBAL_ROOT_NOTE < 127 ? (
+      GLOBAL_ROOT_NOTE += 1;
       );
   resetAllNotes();
 );
 
 function transpose_down()(
-    SINGLE_ROOT_NOTE > 0 ? (
-      SINGLE_ROOT_NOTE -= 1;
+    GLOBAL_ROOT_NOTE > 0 ? (
+      GLOBAL_ROOT_NOTE -= 1;
       );
   resetAllNotes();
 );
@@ -42,17 +42,17 @@ function transpose_down()(
 function mode_decr()
 (
 
-    (MIDI_DEVICE == DEVICE_VKB && MODE > MODE_VKB_LO) ||
-    (MIDI_DEVICE == DEVICE_QMK && MODE > MODE_QMK_LO) ||
-    (MIDI_DEVICE == DEVICE_PIANO_FULL && MODE > MODE_PIANO_LO)
+    (DEVICE == VIRTUAL_KEYBOARD   && MODE > MODE_VKB_LO) ||
+    (DEVICE == ERGODOX_EZ         && MODE > MODE_QMK_LO) ||
+    (DEVICE == PIANO_GRAND        && MODE > MODE_PIANO_LO)
     ? ( MODE -= 1; slider3 = MODE; );
 );
 
 function mode_incr()
 (
-    (MIDI_DEVICE == DEVICE_VKB && MODE < MODE_VKB_HI) ||
-    (MIDI_DEVICE == DEVICE_QMK && MODE < MODE_QMK_HI) ||
-    (MIDI_DEVICE == DEVICE_PIANO_FULL && MODE < MODE_PIANO_HI)
+    (DEVICE == DEVICE_VKB         && MODE < MODE_VKB_HI) ||
+    (DEVICE == DEVICE_QMK         && MODE < MODE_QMK_HI) ||
+    (DEVICE == DEVICE_PIANO_FULL  && MODE < MODE_PIANO_HI)
     ? ( MODE += 1; slider3 = MODE; );
 );
 
