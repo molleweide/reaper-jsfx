@@ -5,19 +5,19 @@ function virtual_keyboard_map_notes(note_in, is_note_on)
 (
   r = -1; num_t = 1;
 
-  MODE == MODE_VKB_SINGLE ? (
+  MODE == VKB_MODE_SINGLE ? (
     keyb_inside_inner_both(note_in) ? r = GLOBAL_ROOT_NOTE;
     note_in == VK_THUMB_L0 ? r = GLOBAL_ROOT_NOTE;
   );
 
-  MODE == MODE_VKB_LINEAR ? (
+  MODE == VKB_MODE_LINEAR ? (
     keyb_inside_inner_both(note_in) ? r = GLOBAL_ROOT_NOTE + note_in + num_t;
     (40 <= note_in && note_in <= 49) ? (
       note_in == VK_THUMB_L0 ? r = GLOBAL_ROOT_NOTE;
     );
   );
 
-  MODE == MODE_VKB_SPLIT_VEL ? (
+  MODE == VKB_MODE_SPLIT_VEL ? (
     is_note_on ? (
         L = keyb_inside_inner_left(note_in);
         L > -1 ? (
@@ -35,7 +35,7 @@ function virtual_keyboard_map_notes(note_in, is_note_on)
     );
   );
 
-  MODE == MODE_VKB_SPLIT_CH ? (
+  MODE == VKB_MODE_SPLIT_CH ? (
     is_note_on ? (
       L = keyb_inside_inner_left(note_in);
       L > -1 ? (

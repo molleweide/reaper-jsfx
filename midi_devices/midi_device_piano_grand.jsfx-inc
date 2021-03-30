@@ -1,11 +1,11 @@
 @init
 
-// mv to util_piano
+// mv to util_piano?
 function piano_grand_inside_full(note)
   local(r)
 (
   r = 0;
- (note >= GRAND_PIANO_LOW && note <= GRAND_PIANO_HIGH) ? r = 1;
+ (note >= PIANO_GRAND_LOW && note <= PIANO_GRAND_HIGH) ? r = 1;
   r;
 );
 

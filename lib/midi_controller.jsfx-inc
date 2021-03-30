@@ -42,17 +42,17 @@ function transpose_down()(
 function mode_decr()
 (
 
-    (DEVICE == VIRTUAL_KEYBOARD   && MODE > MODE_VKB_LO) ||
-    (DEVICE == ERGODOX_EZ         && MODE > MODE_QMK_LO) ||
-    (DEVICE == PIANO_GRAND        && MODE > MODE_PIANO_LO)
+    (DEVICE == VIRTUAL_KEYBOARD   && MODE > VKB_MODE_LO) ||
+    (DEVICE == ERGODOX_EZ         && MODE > ERGODOX_EZ_MODE_LO) ||
+    (DEVICE == PIANO_GRAND        && MODE > PIANO_GRAND_MODE_LO)
     ? ( MODE -= 1; slider3 = MODE; );
 );
 
 function mode_incr()
 (
-    (DEVICE == DEVICE_VKB         && MODE < MODE_VKB_HI) ||
-    (DEVICE == DEVICE_QMK         && MODE < MODE_QMK_HI) ||
-    (DEVICE == DEVICE_PIANO_FULL  && MODE < MODE_PIANO_HI)
+    (DEVICE == VIRTUAL_KEYBOARD   && MODE < VKB_MODE_HI) ||
+    (DEVICE == ERGODOX_EZ         && MODE < ERGODOX_EZ_MODE_HI) ||
+    (DEVICE == PIANO_GRAND        && MODE < PIANO_GRAND_MODE_HI)
     ? ( MODE += 1; slider3 = MODE; );
 );
 

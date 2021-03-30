@@ -1,9 +1,5 @@
 @init
 
-/*
-  !!! qmk key vars should be removed and migrated to new ortho keyb model
- */
-
 // MIDI HELPER VARIABLE
 WAS_FILTERED = 1024;  // array for storing which notes are filtered
 PASS_THRU_CC = 0;
@@ -13,27 +9,16 @@ CHANNEL_MASK=0x0F;
 NOTE_ON=0x90;
 NOTE_OFF=0x80;
 
-GLOBAL_ROOT_NOTE = 24; // GLOBAL_ROOT_NOTE
+GLOBAL_ROOT_NOTE = 24;
 GLOBAL_VEL = 80;
 GLOBAL_CH = 0;
 
-// DEVICES ///////////////////////////////////////
-VIRTUAL_KEYBOARD = 0; // virtual midi keyboard
+// DEVICES
+VIRTUAL_KEYBOARD = 0; // VKB
 ERGODOX_EZ = 1;
 PIANO_GRAND = 2;
 
-
-// make qmk and vkb into one single ??
-// DEVICE MODES /////////////////////////////////
-//
-// i have hardcoded lo/hi because i haven't come up
-// with a good strategy for decoupling these variables
-// into sliders. ideally all of this should be done
-// by checking length of some list/slider param for
-// each device or somthing...
-//
-// how do i work with arrays and stuff in eel???
-
+// DEVICE MODES
 VKB_MODE_LO       = 0;
 VKB_MODE_HI       = 3;
 VKB_MODE_SINGLE       = 0;
@@ -53,6 +38,12 @@ PIANO_GRAND_MODE_LO       = 8;
 PIANO_GRAND_MODE_HI       = 9;
 PIANO_GRAND_MODE_FULL         = 8;
 PIANO_GRAND_MODE_SPLIT        = 9;
+
+
+
+// PIANO_GRAND
+PIANO_GRAND_HIGH = 108;
+PIANO_GRAND_LOW = 33;
 
 
 // NOTE SHIFT NORMALIZE VARS
@@ -92,8 +83,6 @@ PIANO_GRAND_MODE_SPLIT        = 9;
 /* QMK_THUMB_INNER_R1 = 52; */
 
 // grand piano variables
-GRAND_PIANO_HIGH = 108;
-GRAND_PIANO_LOW = 33;
 
 //////////////////////////////////////////////////
 //
