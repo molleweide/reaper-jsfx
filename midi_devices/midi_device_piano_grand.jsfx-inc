@@ -21,7 +21,7 @@ function piano_grand_map_notes(note_in, is_note_on)
 
   MODE == PIANO_GRAND_MODE_FULL ? ( piano_grand_inside_full(note_in) ? r = GLOBAL_ROOT_NOTE + note_in; );
 
-  MODE == PIANO_GRAND_MODE_SPLIT ? ();
+  MODE == PIANO_GRAND_MODE_SPLIT ? ( piano_grand_inside_full(note_in) ? r = GLOBAL_ROOT_NOTE + note_in; );
 
   is_note_on ? (
       note_in == KC_GRAND_TRANSPOSE_RESET   ? GLOBAL_ROOT_NOTE = 24;

@@ -2,20 +2,36 @@
 
 function keyboard_ergodox_ez_map_notes(note_in, is_note_on)
   local(r)
-  local(num_t) // how many thumb keys are used?
+  local(num_t)
+  local(num_tr)
+  local(num_tl)
 (
   r = -1;
-  num_t = 1;
+  num_t = 8;
+  num_tl = 5;
+  num_tr = 5;
 
   MODE == ERGODOX_EZ_MODE_SINGLE ? (
     keyb_inside_inner_both(note_in) ? r = GLOBAL_ROOT_NOTE;
-    note_in == VK_THUMB_L0 ? r = GLOBAL_ROOT_NOTE;
+    is_note_on && is_thumb_key(note_in) ? (
+      note_in == VK_MID_OUTER_R_1 ? transpose_up();
+      note_in == VK_MID_OUTER_L_1 ? transpose_down();
+    )
   );
 
   MODE == ERGODOX_EZ_MODE_LINEAR ? (
     keyb_inside_inner_both(note_in) ? r = GLOBAL_ROOT_NOTE + note_in + num_t;
-    (40 <= note_in && note_in <= 49) ? (
-      note_in == VK_THUMB_L0 ? r = GLOBAL_ROOT_NOTE;
+    is_thumb_key(note_in) ? (
+      note_in == VK_THUMB_L4 ? r = GLOBAL_ROOT_NOTE;
+      note_in == VK_THUMB_L3 ? r = GLOBAL_ROOT_NOTE + 1;
+      note_in == VK_THUMB_L2 ? r = GLOBAL_ROOT_NOTE + 2;
+      note_in == VK_THUMB_L1 ? r = GLOBAL_ROOT_NOTE + 3;
+      note_in == VK_THUMB_L0 ? r = GLOBAL_ROOT_NOTE + 4;
+      note_in == VK_THUMB_R0 ? r = GLOBAL_ROOT_NOTE + 5;
+      note_in == VK_THUMB_R1 ? r = GLOBAL_ROOT_NOTE + 6;
+      note_in == VK_THUMB_R2 ? r = GLOBAL_ROOT_NOTE + 7;
+      note_in == VK_THUMB_R3 ? r = GLOBAL_ROOT_NOTE + 8;
+      note_in == VK_THUMB_R4 ? r = GLOBAL_ROOT_NOTE + 9;
     );
   );
 
@@ -30,10 +46,15 @@ function keyboard_ergodox_ez_map_notes(note_in, is_note_on)
         );
     );
 
+
     R = keyb_inside_inner_right(note_in); //////////
-    R > -1 ? r = R + GLOBAL_ROOT_NOTE + num_t;
+    R > -1 ? r = R + GLOBAL_ROOT_NOTE + num_tr;
     is_thumb_key(note_in) ? (
-      note_in == VK_THUMB_L0 ? r = GLOBAL_ROOT_NOTE;
+      note_in == VK_THUMB_R0 ? r = GLOBAL_ROOT_NOTE;
+      note_in == VK_THUMB_R1 ? r = GLOBAL_ROOT_NOTE + 1;
+      note_in == VK_THUMB_R2 ? r = GLOBAL_ROOT_NOTE + 2;
+      note_in == VK_THUMB_R3 ? r = GLOBAL_ROOT_NOTE + 3;
+      note_in == VK_THUMB_R4 ? r = GLOBAL_ROOT_NOTE + 4;
     );
   );
 
@@ -47,9 +68,13 @@ function keyboard_ergodox_ez_map_notes(note_in, is_note_on)
         );
     );
     R = keyb_inside_inner_right(note_in); //////////
-    R > -1 ? r = R + GLOBAL_ROOT_NOTE + num_t;
+    R > -1 ? r = R + GLOBAL_ROOT_NOTE + num_tr;
     is_thumb_key(note_in) ? (
-      note_in == VK_THUMB_L0 ? r = GLOBAL_ROOT_NOTE;
+      note_in == VK_THUMB_R0 ? r = GLOBAL_ROOT_NOTE;
+      note_in == VK_THUMB_R1 ? r = GLOBAL_ROOT_NOTE + 1;
+      note_in == VK_THUMB_R2 ? r = GLOBAL_ROOT_NOTE + 2;
+      note_in == VK_THUMB_R3 ? r = GLOBAL_ROOT_NOTE + 3;
+      note_in == VK_THUMB_R4 ? r = GLOBAL_ROOT_NOTE + 4;
     );
   );
 
@@ -61,11 +86,11 @@ function keyboard_ergodox_ez_map_notes(note_in, is_note_on)
       note_in == VK_NUM_5 ? GLOBAL_ROOT_NOTE = 72;resetAllNotes();
       note_in == VK_NUM_6 ? GLOBAL_ROOT_NOTE = 84;resetAllNotes();
 
-      note_in == VK_MID_OUTER_R_3 ? transpose_up();
-      note_in == VK_TOP_OUTER_L_1 ? transpose_down();
+      note_in == VK_MID_OUTER_R_1 ? transpose_up();
+      note_in == VK_MID_OUTER_L_1 ? transpose_down();
 
-      note_in == VK_TOP_OUTER_R_1 ? mode_decr();
-      note_in == VK_TOP_OUTER_R_2 ? mode_incr();
+      note_in == VK_TOP_OUTER_L_1 ? mode_decr();
+      note_in == VK_TOP_OUTER_R_1 ? mode_incr();
   );
 
   r;

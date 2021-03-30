@@ -3,7 +3,7 @@ author: molleweide
 version: 1.0
 
 import ./lib/variables.jsfx-inc
-import ./lib/keyboard_model.jsfx-inc
+import ./lib/model_keyboard.jsfx-inc
 import ./lib/util_keyboard.jsfx-inc
 import ./lib/util_keyboard.jsfx-inc
 import ./lib/midi_controller.jsfx-inc
@@ -40,7 +40,7 @@ while (
     // note on /////////////////////////////////////////////
     midi_in_type == NOTE_ON && midi_in_vel > 0 ? (
 
-      midi_out_note_on = handleMidiKeys(MODE, midi_in_note);
+      midi_out_note_on = device_route_midi_events(midi_in_note, 1);
 
       (midi_out_note_on > -1) ? ( // IF MIDI NOTE <<<
 
@@ -57,7 +57,7 @@ while (
 
 
         WAS_FILTERED[midi_in_note] = 1;
-        handleControlKeys(DEVICE, MODE, midi_in_note); // remove this
+        /* handleControlKeys(DEVICE, MODE, midi_in_note); // remove this */
 
 
 
@@ -78,7 +78,7 @@ while (
       ):(
 
 
-          midi_out_note_off = handleMidiKeys(MODE, midi_in_note);
+          midi_out_note_off = device_route_midi_events(midi_in_note, 0);
 
           (midi_out_note_on >= -1) ? (
               device_has_vel(DEVICE) ? midi_out_vel = midi_in_vel : midi_out_vel = GLOBAL_VEL;
