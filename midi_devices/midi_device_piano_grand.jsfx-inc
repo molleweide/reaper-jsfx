@@ -1,92 +1,36 @@
 @init
 
-// return NOTE output number
-// if not note output >> return -1
+// mv to util_piano
+function piano_grand_inside_full(note)
+  local(r)
+(
+  r = 0;
+ (note >= GRAND_PIANO_LOW && note <= GRAND_PIANO_HIGH) ? r = 1;
+  r;
+);
 
-function virtual_keyboard_map_notes(note_in)
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+
+function piano_grand_map_notes(note_in, is_note_on)
   local(r) local(num_t) // how many thumb keys are used?
 (
   r = -1; num_t = 1;
 
-  // SINGLE :::::::::::::::::::::::::::
+  MODE == PIANO_GRAND_MODE_FULL ? ( piano_grand_inside_full(note_in) ? r = GLOBAL_ROOT_NOTE + note_in; );
 
-  MODE == MODE_VKB_SINGLE ? (
-    keyb_inside_inner_both(note_in) ? r = SINGLE_ROOT_NOTE;
-    note_in == VK_THUMB_L0 ? r = SINGLE_ROOT_NOTE;
+  MODE == PIANO_GRAND_MODE_SPLIT ? ();
+
+  is_note_on ? (
+      note_in == KC_GRAND_TRANSPOSE_RESET   ? GLOBAL_ROOT_NOTE = 24;
+      note_in == KC_GRAND_RESET_ALL_NOTES   ? resetAllNotes();
+      note_in == KC_GRAND_TRANSPOSE_UP      ? transpose_up();
+      note_in == KC_GRAND_TRANSPOSE_DOWN    ? transpose_down();
+      note_in == KC_GRAND_DECR_MODE         ? mode_decr();
+      note_in == KC_GRAND_INCR_MODE         ? mode_incr();
   );
-
-  // LINEAR :::::::::::::::::::::::::::
-
-  MODE == MODE_VKB_LINEAR ? (
-    keyb_inside_inner_both(note_in) ? r = SINGLE_ROOT_NOTE + note_in + num_t;
-    (40 <= note_in && note_in <= 49) ? (
-      note_in == VK_THUMB_L0 ? r = SINGLE_ROOT_NOTE;
-    );
-  );
-
-  // SPLIT VEL :::::::::::::::::::::::::::
-  // velocity left / pitch right
-  // experimental
-
-  MODE == MODE_VKB_SPLIT_VEL ? (
-    L = keyb_inside_inner_left(note_in);
-    L > -1 ? (
-      L = L*127/15;
-      L < 1 ? L = 1;
-      L > 127 ? L = 127;
-      GLOBAL_VEL = floor(L);
-    );
-
-    R = keyb_inside_inner_right(note_in); //////////
-    R > -1 ? r = R + SINGLE_ROOT_NOTE + num_t;
-    is_thumb_key(note_in) ? (
-      note_in == VK_THUMB_L0 ? r = SINGLE_ROOT_NOTE;
-    );
-  );
-
-  // SPLIT CH :::::::::::::::::::::::::::
-  // ch switch left / pitch right
-  // experimental
-
-  MODE == MODE_VKB_SPLIT_CH ? (
-    L = keyb_inside_inner_left(note_in);
-    L > -1 ? (
-      L == 0 ? L = 1;
-      L > 16 ? L = 16;
-      GLOBAL_CH = L;
-    );
-    R = keyb_inside_inner_right(note_in); //////////
-    R > -1 ? r = R + SINGLE_ROOT_NOTE + num_t;
-    is_thumb_key(note_in) ? (
-      note_in == VK_THUMB_L0 ? r = SINGLE_ROOT_NOTE;
-    );
-  );
-
-  // :::::::::::::::::::::::::::::::::::
 
   r;
-);
-
-//////////////////////////////////////////////////////////////////////////
-//
-// SETTINGS KEYS
-//
-//////////////////////////////////////////////////////////////////////////
-
-function vk_settings(note_in)
-(
-  note_in == VK_NUM_1 ? SINGLE_ROOT_NOTE = 24;resetAllNotes();
-  note_in == VK_NUM_2 ? SINGLE_ROOT_NOTE = 36;resetAllNotes();
-  note_in == VK_NUM_3 ? SINGLE_ROOT_NOTE = 48;resetAllNotes();
-  note_in == VK_NUM_4 ? SINGLE_ROOT_NOTE = 60;resetAllNotes();
-  note_in == VK_NUM_5 ? SINGLE_ROOT_NOTE = 72;resetAllNotes();
-  note_in == VK_NUM_6 ? SINGLE_ROOT_NOTE = 84;resetAllNotes();
-
-  note_in == VK_MID_OUTER_R_3 ? transpose_up();
-  note_in == VK_TOP_OUTER_L_1 ? transpose_down();
-
-  note_in == VK_TOP_OUTER_R_1 ? mode_decr();
-  note_in == VK_TOP_OUTER_R_2 ? mode_incr();
-
-  resetAllNotes(); // mv to if press KC_QMK_RESET_ALL_MIDI
 );

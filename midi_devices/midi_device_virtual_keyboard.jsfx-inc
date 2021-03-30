@@ -1,21 +1,14 @@
 @init
 
-// return NOTE output number
-// if not note output >> return -1
-
-function virtual_keyboard_map_notes(note_in)
+function virtual_keyboard_map_notes(note_in, is_note_on)
   local(r) local(num_t)
 (
   r = -1; num_t = 1;
-
-  // SINGLE :::::::::::::::::::::::::::
 
   MODE == MODE_VKB_SINGLE ? (
     keyb_inside_inner_both(note_in) ? r = GLOBAL_ROOT_NOTE;
     note_in == VK_THUMB_L0 ? r = GLOBAL_ROOT_NOTE;
   );
-
-  // LINEAR :::::::::::::::::::::::::::
 
   MODE == MODE_VKB_LINEAR ? (
     keyb_inside_inner_both(note_in) ? r = GLOBAL_ROOT_NOTE + note_in + num_t;
@@ -24,16 +17,16 @@ function virtual_keyboard_map_notes(note_in)
     );
   );
 
-  // SPLIT VEL :::::::::::::::::::::::::::
-
   MODE == MODE_VKB_SPLIT_VEL ? (
-    L = keyb_inside_inner_left(note_in);
-    L > -1 ? (
-      L = L*127/15;
-      L < 1 ? L = 1;
-      L > 127 ? L = 127;
-      GLOBAL_VEL = floor(L);
-    );
+    is_note_on ? (
+        L = keyb_inside_inner_left(note_in);
+        L > -1 ? (
+          L = L*127/15;
+          L < 1 ? L = 1;
+          L > 127 ? L = 127;
+          GLOBAL_VEL = floor(L);
+        );
+    ):
 
     R = keyb_inside_inner_right(note_in); //////////
     R > -1 ? r = R + GLOBAL_ROOT_NOTE + num_t;
@@ -41,15 +34,15 @@ function virtual_keyboard_map_notes(note_in)
       note_in == VK_THUMB_L0 ? r = GLOBAL_ROOT_NOTE;
     );
   );
-
-  // SPLIT CH :::::::::::::::::::::::::::
 
   MODE == MODE_VKB_SPLIT_CH ? (
-    L = keyb_inside_inner_left(note_in);
-    L > -1 ? (
-      L == 0 ? L = 1;
-      L > 16 ? L = 16;
-      GLOBAL_CH = L;
+    is_note_on ? (
+      L = keyb_inside_inner_left(note_in);
+      L > -1 ? (
+        L == 0 ? L = 1;
+        L > 16 ? L = 16;
+        GLOBAL_CH = L;
+      );
     );
     R = keyb_inside_inner_right(note_in); //////////
     R > -1 ? r = R + GLOBAL_ROOT_NOTE + num_t;
@@ -58,22 +51,20 @@ function virtual_keyboard_map_notes(note_in)
     );
   );
 
-  // :::::::::::::::::::::::::::::::::::
+  is_note_on ? (
+      note_in == VK_NUM_1 ? GLOBAL_ROOT_NOTE = 24;resetAllNotes();
+      note_in == VK_NUM_2 ? GLOBAL_ROOT_NOTE = 36;resetAllNotes();
+      note_in == VK_NUM_3 ? GLOBAL_ROOT_NOTE = 48;resetAllNotes();
+      note_in == VK_NUM_4 ? GLOBAL_ROOT_NOTE = 60;resetAllNotes();
+      note_in == VK_NUM_5 ? GLOBAL_ROOT_NOTE = 72;resetAllNotes();
+      note_in == VK_NUM_6 ? GLOBAL_ROOT_NOTE = 84;resetAllNotes();
 
-  note_in == VK_NUM_1 ? GLOBAL_ROOT_NOTE = 24;resetAllNotes();
-  note_in == VK_NUM_2 ? GLOBAL_ROOT_NOTE = 36;resetAllNotes();
-  note_in == VK_NUM_3 ? GLOBAL_ROOT_NOTE = 48;resetAllNotes();
-  note_in == VK_NUM_4 ? GLOBAL_ROOT_NOTE = 60;resetAllNotes();
-  note_in == VK_NUM_5 ? GLOBAL_ROOT_NOTE = 72;resetAllNotes();
-  note_in == VK_NUM_6 ? GLOBAL_ROOT_NOTE = 84;resetAllNotes();
+      note_in == VK_MID_OUTER_R_3 ? transpose_up();
+      note_in == VK_TOP_OUTER_L_1 ? transpose_down();
 
-  note_in == VK_MID_OUTER_R_3 ? transpose_up();
-  note_in == VK_TOP_OUTER_L_1 ? transpose_down();
-
-  note_in == VK_TOP_OUTER_R_1 ? mode_decr();
-  note_in == VK_TOP_OUTER_R_2 ? mode_incr();
-
-  // return ::::::::::::::::::::::::::::
+      note_in == VK_TOP_OUTER_R_1 ? mode_decr();
+      note_in == VK_TOP_OUTER_R_2 ? mode_incr();
+  );
 
   r;
 );
