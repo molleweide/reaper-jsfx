@@ -1,13 +1,13 @@
 @init
 
 // MIDI HELPER VARIABLE
-WAS_FILTERED = 1024;  // array for storing which notes are filtered
 PASS_THRU_CC = 0;
-
 TYPE_MASK=0xF0;
 CHANNEL_MASK=0x0F;
 NOTE_ON=0x90;
 NOTE_OFF=0x80;
+
+// GLOBAL MIDI VARS
 
 GLOBAL_ROOT_NOTE = 24;
 GLOBAL_VEL = 80;
@@ -38,72 +38,3 @@ PIANO_GRAND_MODE_LO       = 8;
 PIANO_GRAND_MODE_HI       = 9;
 PIANO_GRAND_MODE_FULL         = 8;
 PIANO_GRAND_MODE_SPLIT        = 9;
-
-
-
-// PIANO_GRAND
-PIANO_GRAND_HIGH = 108;
-PIANO_GRAND_LOW = 33;
-
-
-// NOTE SHIFT NORMALIZE VARS
-// the idea is that default output should be for lower left `z` 24
-// so you have to apply a shift to each device to be sure that they are all synced
-// with time a nice config file template should spring up here...
-/* VK_NOTE_SHIFT_NORMALIZE = 24; */
-/* QMK_NOTE_SHIFT_NORMALIZE = 48; */
-/* GPAND_PIANO_NOTE_SHIFT_NORMALIZE = 24; */
-
-
-
-
-// QMK VARIABLES
-/* QMK_FULL_HIGH = 85; */
-/* QMK_FULL_LOW = 48; */
-/* QMK_SINGLE_HIGH = QMK_FULL_HIGH; */
-/* QMK_SINGLE_LOW = 56; */
-
-/* QMK_ROW_HIGH_L_START = 76; */
-/* QMK_ROW_HIGH_L_END = 80; */
-/* QMK_ROW_HIGH_R_START = 81; */
-/* QMK_ROW_HIGH_R_END = 85; */
-/* QMK_ROW_MID_L_start = 66; */
-/* QMK_ROW_MID_L_end = 70; */
-/* QMK_ROW_MID_R_start = 71; */
-/* QMK_ROW_MID_R_end = 75; */
-/* QMK_ROW_LOW_L_START = 56; */
-/* QMK_ROW_LOW_L_END = 60; */
-/* QMK_ROW_LOW_R_START = 61; */
-/* QMK_ROW_LOW_R_END = 65; //////////////////////////// */
-/* QMK_ROW_BOTTOM_L_START = 48; ///////////////////////// */
-/* QMK_ROW_BOTTOM_L_END = 50; */
-/* QMK_ROW_BOTTOM_R_START = 53; */
-/* QMK_ROW_BOTTOM_R_END = 55; */
-/* QMK_THUMB_INNER_L1 = 51; */
-/* QMK_THUMB_INNER_R1 = 52; */
-
-// grand piano variables
-
-//////////////////////////////////////////////////
-//
-// MIDI COMMANDS BELOW
-//
-// if I add int midi number keycodes to qmk, then
-// it will be easy to use the keyboard model for all keyb.
-// >>> i can remove this
-//
-////////////////////////////////////////////
-
-/* KC_QMK_TRANSPOSE_THUMBS_DOWN = 50; */
-/* KC_QMK_TRANSPOSE_THUMBS_UP = 53; */
-/* KC_QMK_TRANSPOSE_PINKY_UP = 115; // pinky up/down left/rigth */
-/* KC_QMK_TRANSPOSE_PINKY_DOWN = 110; */
-/* KC_QMK_DECR_MODE = 111; */
-/* KC_QMK_INCR_MODE = 116; */
-/* KC_QMK_TRANSPOSE_RESET_1 = 86; */
-/* KC_QMK_TRANSPOSE_RESET_2 = 87; */
-/* KC_QMK_TRANSPOSE_RESET_3 = 88; */
-/* KC_QMK_TRANSPOSE_RESET_4 = 89; */
-/* KC_QMK_TRANSPOSE_RESET_5 = 90; */
-//KC_QMK_RESET_ALL_MIDI = ???;
-
