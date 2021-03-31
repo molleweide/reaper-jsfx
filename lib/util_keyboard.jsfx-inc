@@ -21,10 +21,10 @@ function keyb_inside_inner_left(note)(
   retval = -1;
     (VK_TOP_L_START <= note && note <= VK_TOP_L_END) ? (
       retval = note - 10;
-    );
+    ):
     (VK_MID_L_START <= note && note <= VK_MID_L_END) ? (
       retval = note - 5;
-    );
+    ):
     (VK_LOW_L_START <= note && note <= VK_LOW_L_END) ? (
       retval = note;
     );
@@ -34,10 +34,10 @@ function keyb_inside_inner_right(note)(
   retval = -1;
     (VK_TOP_R_START <= note && note <= VK_TOP_R_END) ? (
       retval = note - 15;
-    );
+    ):
     (VK_MID_R_START <= note && note <= VK_MID_R_END) ? (
       retval = note - 10;
-    );
+    ):
     (VK_LOW_R_START <= note && note <= VK_LOW_R_END) ? (
       retval = note - 5;
     );

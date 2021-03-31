@@ -1,5 +1,7 @@
 # REAPER JSFX TODO
 
+hhmmm why is it clipping for me?
+
 make keyboard model vars as short as possible
 
 create comment layout

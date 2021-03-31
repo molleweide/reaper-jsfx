@@ -36,7 +36,6 @@ while (
     midi_in_note = msg2;
     midi_in_vel = msg3;
 
-
     // note on /////////////////////////////////////////////
     midi_in_type == NOTE_ON && midi_in_vel > 0 ? (
 
@@ -45,23 +44,14 @@ while (
       (midi_out_note_on > -1) ? ( // IF MIDI NOTE <<<
 
 
-
         device_has_vel(DEVICE) ? midi_out_vel = midi_in_vel : midi_out_vel = GLOBAL_VEL;
         midi_out_ch = GLOBAL_CH;
         midisend(offset,midi_in_type+midi_out_ch,midi_out_note_on,midi_out_vel);
 
-
-
-      ):( // ELSE
-
-
-
-        WAS_FILTERED[midi_in_note] = 1;
-        /* handleControlKeys(DEVICE, MODE, midi_in_note); // remove this */
-
-
-
       );
+      /* :( // ELSE */
+      /*   WAS_FILTERED[midi_in_note] = 1; */
+      /* ); */
     ):
 
     // NOTE OFF ////////////////////////////////////////////
@@ -69,23 +59,24 @@ while (
 
 
 
-      WAS_FILTERED[midi_in_note] ? (
+      /* WAS_FILTERED[midi_in_note] ? ( */
 
-        WAS_FILTERED[midi_in_note] = 0;
+      /*   WAS_FILTERED[midi_in_note] = 0; */
 
 
 
-      ):(
+      /* ):( */
 
 
           midi_out_note_off = device_route_midi_events(midi_in_note, 0);
 
-          (midi_out_note_on >= -1) ? (
+          (midi_out_note_off >= -1) ? (
               device_has_vel(DEVICE) ? midi_out_vel = midi_in_vel : midi_out_vel = GLOBAL_VEL;
               midi_out_ch = GLOBAL_CH;
               midisend(offset,midi_in_type+midi_out_ch,midi_out_note_off,midi_out_vel);
           );
-      ); // WAS FLT
+
+      /* ); // WAS FLT */
 
 
 

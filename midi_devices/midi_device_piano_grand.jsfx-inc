@@ -19,16 +19,14 @@ function piano_grand_map_notes(note_in, is_note_on)
 (
   r = -1; num_t = 1;
 
-  MODE == PIANO_GRAND_MODE_FULL ? ( piano_grand_inside_full(note_in) ? r = GLOBAL_ROOT_NOTE + note_in; );
-
-  MODE == PIANO_GRAND_MODE_SPLIT ? ( piano_grand_inside_full(note_in) ? r = GLOBAL_ROOT_NOTE + note_in; );
-
+  MODE == PIANO_GRAND_MODE_FULL ? ( piano_grand_inside_full(note_in) ? r = GLOBAL_ROOT_NOTE + note_in; ):
+  MODE == PIANO_GRAND_MODE_SPLIT ? ( piano_grand_inside_full(note_in) ? r = GLOBAL_ROOT_NOTE + note_in; ):
   is_note_on ? (
-      note_in == KC_GRAND_TRANSPOSE_RESET   ? GLOBAL_ROOT_NOTE = 24;
-      note_in == KC_GRAND_RESET_ALL_NOTES   ? resetAllNotes();
-      note_in == KC_GRAND_TRANSPOSE_UP      ? transpose_up();
-      note_in == KC_GRAND_TRANSPOSE_DOWN    ? transpose_down();
-      note_in == KC_GRAND_DECR_MODE         ? mode_decr();
+      note_in == KC_GRAND_TRANSPOSE_RESET   ? GLOBAL_ROOT_NOTE = 24:
+      note_in == KC_GRAND_RESET_ALL_NOTES   ? resetAllNotes():
+      note_in == KC_GRAND_TRANSPOSE_UP      ? transpose_up():
+      note_in == KC_GRAND_TRANSPOSE_DOWN    ? transpose_down():
+      note_in == KC_GRAND_DECR_MODE         ? mode_decr():
       note_in == KC_GRAND_INCR_MODE         ? mode_incr();
   );
 

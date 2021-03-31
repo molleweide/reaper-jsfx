@@ -3,14 +3,13 @@
 function device_route_midi_events(note, is_note_on)
   local(r)
 (
-  r = 0;
+  r = -1;
 
-    DEVICE == VIRTUAL_KEYBOARD ? ( r = virtual_keyboard_map_notes(note, is_note_on); );
+    DEVICE == VIRTUAL_KEYBOARD  ?  r = virtual_keyboard_map_notes(note, is_note_on):
 
+    DEVICE == ERGODOX_EZ        ?  r = keyboard_ergodox_ez_map_notes(note - 48, is_note_on):
 
-    DEVICE == ERGODOX_EZ ? ( r = keyboard_ergodox_ez_map_notes(note - 48, is_note_on); );
-
-    DEVICE == PIANO_GRAND ? ( r = piano_grand_map_notes(note, is_note_on); );
+    DEVICE == PIANO_GRAND       ?  r = piano_grand_map_notes(note, is_note_on);
 
     r;
 );

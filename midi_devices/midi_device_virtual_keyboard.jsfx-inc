@@ -6,16 +6,16 @@ function virtual_keyboard_map_notes(note_in, is_note_on)
   r = -1; num_t = 1;
 
   MODE == VKB_MODE_SINGLE ? (
-    keyb_inside_inner_both(note_in) ? r = GLOBAL_ROOT_NOTE;
+    keyb_inside_inner_both(note_in) ? r = GLOBAL_ROOT_NOTE:
     note_in == VK_THUMB_L0 ? r = GLOBAL_ROOT_NOTE;
-  );
+  ):
 
   MODE == VKB_MODE_LINEAR ? (
-    keyb_inside_inner_both(note_in) ? r = GLOBAL_ROOT_NOTE + note_in + num_t;
-    (40 <= note_in && note_in <= 49) ? (
+    keyb_inside_inner_both(note_in) ? r = GLOBAL_ROOT_NOTE + note_in + num_t:
+    is_thumb_key(note_in) ? (
       note_in == VK_THUMB_L0 ? r = GLOBAL_ROOT_NOTE;
     );
-  );
+  ):
 
   MODE == VKB_MODE_SPLIT_VEL ? (
     is_note_on ? (
@@ -26,14 +26,14 @@ function virtual_keyboard_map_notes(note_in, is_note_on)
           L > 127 ? L = 127;
           GLOBAL_VEL = floor(L);
         );
-    ):
+    );
 
     R = keyb_inside_inner_right(note_in); //////////
-    R > -1 ? r = R + GLOBAL_ROOT_NOTE + num_t;
+    R > -1 ? r = R + GLOBAL_ROOT_NOTE + num_t:
     is_thumb_key(note_in) ? (
       note_in == VK_THUMB_L0 ? r = GLOBAL_ROOT_NOTE;
     );
-  );
+  ):
 
   MODE == VKB_MODE_SPLIT_CH ? (
     is_note_on ? (
@@ -45,24 +45,22 @@ function virtual_keyboard_map_notes(note_in, is_note_on)
       );
     );
     R = keyb_inside_inner_right(note_in); //////////
-    R > -1 ? r = R + GLOBAL_ROOT_NOTE + num_t;
+    R > -1 ? r = R + GLOBAL_ROOT_NOTE + num_t:
     is_thumb_key(note_in) ? (
       note_in == VK_THUMB_L0 ? r = GLOBAL_ROOT_NOTE;
     );
-  );
+  ):
 
   is_note_on ? (
-      note_in == VK_NUM_1 ? GLOBAL_ROOT_NOTE = 24;resetAllNotes();
-      note_in == VK_NUM_2 ? GLOBAL_ROOT_NOTE = 36;resetAllNotes();
-      note_in == VK_NUM_3 ? GLOBAL_ROOT_NOTE = 48;resetAllNotes();
-      note_in == VK_NUM_4 ? GLOBAL_ROOT_NOTE = 60;resetAllNotes();
-      note_in == VK_NUM_5 ? GLOBAL_ROOT_NOTE = 72;resetAllNotes();
-      note_in == VK_NUM_6 ? GLOBAL_ROOT_NOTE = 84;resetAllNotes();
-
-      note_in == VK_MID_OUTER_R_3 ? transpose_up();
-      note_in == VK_TOP_OUTER_L_1 ? transpose_down();
-
-      note_in == VK_TOP_OUTER_R_1 ? mode_decr();
+      note_in == VK_NUM_1         ? GLOBAL_ROOT_NOTE = 24:
+      note_in == VK_NUM_2         ? GLOBAL_ROOT_NOTE = 36:
+      note_in == VK_NUM_3         ? GLOBAL_ROOT_NOTE = 48:
+      note_in == VK_NUM_4         ? GLOBAL_ROOT_NOTE = 60:
+      note_in == VK_NUM_5         ? GLOBAL_ROOT_NOTE = 72:
+      note_in == VK_NUM_6         ? GLOBAL_ROOT_NOTE = 84:
+      note_in == VK_MID_OUTER_R_3 ? transpose_up():
+      note_in == VK_TOP_OUTER_L_1 ? transpose_down():
+      note_in == VK_TOP_OUTER_R_1 ? mode_decr():
       note_in == VK_TOP_OUTER_R_2 ? mode_incr();
   );
 
