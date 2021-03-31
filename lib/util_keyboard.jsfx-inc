@@ -20,8 +20,8 @@ function keyb_inside_inner_left(note)
   local(r)
 (
   r = -1;
-  (VK_TOP_L_START <= note && note <= VK_TOP_L_END) ? r = note - 10:
-  (VK_MID_L_START <= note && note <= VK_MID_L_END) ? r = note - 5:
+  (VK_TOP_L_START <= note && note <= VK_TOP_L_END) ? r = note - 10;
+  (VK_MID_L_START <= note && note <= VK_MID_L_END) ? r = note - 5;
   (VK_LOW_L_START <= note && note <= VK_LOW_L_END) ? r = note;
   r;
 );
@@ -29,8 +29,8 @@ function keyb_inside_inner_right(note)
   local(r)
 (
   r = -1;
-  (VK_TOP_R_START <= note && note <= VK_TOP_R_END) ? r = note - 15:
-  (VK_MID_R_START <= note && note <= VK_MID_R_END) ? r = note - 10:
+  (VK_TOP_R_START <= note && note <= VK_TOP_R_END) ? r = note - 15;
+  (VK_MID_R_START <= note && note <= VK_MID_R_END) ? r = note - 10;
   (VK_LOW_R_START <= note && note <= VK_LOW_R_END) ? r = note - 5;
   r;
 );

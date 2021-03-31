@@ -1,6 +1,10 @@
 # REAPER JSFX TODO
 
-hhmmm why is it clipping for me?
+i think that there is something about how return values in eel
+that i don't understand fully
+
+
+
 
 make keyboard model vars as short as possible
 
