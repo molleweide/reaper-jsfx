@@ -12,11 +12,14 @@ function keyboard_ergodox_ez_map_notes(note_in, is_note_on)
   num_tr = 5;
 
   MODE == ERGODOX_EZ_MODE_SINGLE ? (
-    keyb_inside_inner_both(note_in) ? r = GLOBAL_ROOT_NOTE;
-    is_note_on && is_thumb_key(note_in) ? (
-      note_in == VK_MID_OUTER_R_1 ? transpose_up();
-      note_in == VK_MID_OUTER_L_1 ? transpose_down();
-    )
+    keyb_inside_inner_both(note_in) ? (
+      r = GLOBAL_ROOT_NOTE;
+    ):(
+      is_note_on && is_thumb_key(note_in) ? (
+        note_in == VK_MID_OUTER_R_1 ? transpose_up();
+        note_in == VK_MID_OUTER_L_1 ? transpose_down();
+      )
+    );
   );
 
   MODE == ERGODOX_EZ_MODE_LINEAR ? (
